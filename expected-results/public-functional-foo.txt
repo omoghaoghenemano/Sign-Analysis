@@ -1,0 +1,2 @@
+-c de.uni_passau.fim.se2.sa.examples.PublicFunctional -m "foo:()I"
+Line 80: ERROR: Negative Array Index detected

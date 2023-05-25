@@ -1,0 +1,2 @@
+-c de.uni_passau.fim.se2.sa.examples.PublicFunctional -m "first:()I"
+No warnings or errors found

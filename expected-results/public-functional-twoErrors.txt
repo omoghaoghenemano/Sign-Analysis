@@ -1,0 +1,3 @@
+-c de.uni_passau.fim.se2.sa.examples.PublicFunctional -m "twoErrors:()V"
+Line 42: ERROR: Division by Zero detected
+Line 42: ERROR: Negative Array Index detected

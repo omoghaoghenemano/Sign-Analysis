@@ -1,0 +1,2 @@
+-c de.uni_passau.fim.se2.sa.examples.PublicFunctional -m "bar:()I"
+Line 92: WARNING: Negative Array Index detected

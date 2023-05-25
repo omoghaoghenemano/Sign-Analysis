@@ -1,0 +1,8 @@
+-c de.uni_passau.fim.se2.sa.examples.PublicFunctional -m "allCases:()I"
+Line 24: ERROR: Division by Zero detected
+Line 25: WARNING: Division by Zero detected
+Line 26: WARNING: Division by Zero detected
+Line 27: WARNING: Division by Zero detected
+Line 30: ERROR: Negative Array Index detected
+Line 31: WARNING: Negative Array Index detected
+Line 34: WARNING: Division by Zero detected

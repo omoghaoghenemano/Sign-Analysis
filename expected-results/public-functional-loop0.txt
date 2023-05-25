@@ -1,0 +1,2 @@
+-c de.uni_passau.fim.se2.sa.examples.PublicFunctional -m "loop0:()V"
+Line 59: WARNING: Division by Zero detected
