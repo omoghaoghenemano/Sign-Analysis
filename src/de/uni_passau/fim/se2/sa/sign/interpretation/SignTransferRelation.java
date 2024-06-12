@@ -48,6 +48,7 @@ public class SignTransferRelation implements TransferRelation {
 
     switch (pOperation) {
       case ADD:
+        if (pLHS == SignValue.ZERO && pRHS == SignValue.UNINITIALIZED_VALUE) return  SignValue.TOP;
         if (pLHS == SignValue.ZERO) return pRHS;
         if (pRHS == SignValue.ZERO) return pLHS;
         if (pLHS == SignValue.BOTTOM && pRHS == SignValue.BOTTOM) return SignValue.BOTTOM;
@@ -60,7 +61,8 @@ public class SignTransferRelation implements TransferRelation {
         if ((pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) || (pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.MINUS)) return SignValue.TOP;
         if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.MINUS;
         if (pRHS == SignValue.MINUS && pLHS == SignValue.ZERO_MINUS) return SignValue.MINUS;
-        if (pLHS ==  SignValue.MINUS && pRHS == SignValue.PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.ZERO_PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.TOP || pLHS ==  SignValue.MINUS && pRHS == SignValue.UNINITIALIZED_VALUE) return SignValue.TOP;
+        if (pLHS ==  SignValue.MINUS && pRHS == SignValue.PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.ZERO_PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.TOP
+                || pLHS ==  SignValue.MINUS && pRHS == SignValue.UNINITIALIZED_VALUE ) return SignValue.TOP;
         return SignValue.BOTTOM;
 
       case SUB:
