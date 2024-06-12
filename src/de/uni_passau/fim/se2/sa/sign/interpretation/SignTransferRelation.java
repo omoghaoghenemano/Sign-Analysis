@@ -57,8 +57,9 @@ public class SignTransferRelation implements TransferRelation {
         if (pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.PLUS) return SignValue.PLUS;
         if (pLHS == SignValue.BOTTOM && pRHS == SignValue.ZERO_PLUS) return SignValue.BOTTOM;
         if (pLHS == SignValue.BOTTOM && pRHS == SignValue.ZERO_MINUS) return SignValue.BOTTOM;
+        if(pLHS == SignValue.TOP && pRHS == SignValue.ZERO || pLHS == SignValue.TOP && pRHS == SignValue.MINUS || pLHS == SignValue.TOP && pRHS == SignValue.ZERO)  return SignValue.TOP;
         if ((pLHS == SignValue.PLUS && pRHS == SignValue.MINUS) || (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS)) return SignValue.TOP;
-        return SignValue.TOP;
+        return SignValue.BOTTOM;
 
       case SUB:
         if (pLHS == SignValue.ZERO) return pRHS == SignValue.ZERO ? SignValue.ZERO : pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS;
