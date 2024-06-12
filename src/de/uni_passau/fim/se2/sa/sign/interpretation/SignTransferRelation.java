@@ -158,38 +158,115 @@ public class SignTransferRelation implements TransferRelation {
         }
 
         return SignValue.TOP;
-
       case MUL:
-        if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
-          return  SignValue.BOTTOM;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) return SignValue.PLUS_MINUS;
-        if (pRHS == SignValue.MINUS && pLHS == SignValue.PLUS_MINUS) return SignValue.PLUS_MINUS;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.ZERO_PLUS;
-        if (pRHS == SignValue.MINUS && pLHS == SignValue.ZERO_MINUS) return SignValue.ZERO_PLUS;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_PLUS) return SignValue.ZERO_MINUS;
-        if (pRHS == SignValue.MINUS && pLHS == SignValue.ZERO_PLUS) return SignValue.ZERO_MINUS;
-        if (pLHS == SignValue.ZERO || pRHS == SignValue.ZERO) return SignValue.ZERO;
+        // Handle bottom cases
+        if (pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM)) {
+          return SignValue.BOTTOM;
+        }
+
+        // Handle uninitialized and zero cases
+        if (pLHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.ZERO) {
+          return SignValue.TOP; // Not clear what should happen in this case, returning TOP
+        }
+
+        // Handle PLUS_MINUS cases
+        if (pLHS == SignValue.PLUS_MINUS) {
+          if (pRHS == SignValue.ZERO) {
+            return SignValue.ZERO;
+          }
+          // Additional cases can be added here if needed
+        }
+
+        // Handle ZERO cases
+        if (pLHS == SignValue.ZERO) {
+          if (pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.PLUS_MINUS) {
+            return SignValue.ZERO_PLUS; // Assuming ZERO_PLUS as the priority
+          }
+          if (pRHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.TOP || pRHS == SignValue.ZERO) {
+            return pRHS;
+          }
+          // Additional cases can be added here if needed
+          return pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS; // Default case
+        }
+
+        // Handle MINUS cases
+        if (pLHS == SignValue.MINUS) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.MINUS) {
+            return SignValue.MINUS; // Assuming MINUS as the priority
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        // Handle ZERO_PLUS cases
+        if (pLHS == SignValue.ZERO_PLUS) {
+          if (pRHS == SignValue.MINUS || pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.ZERO) {
+            return SignValue.MINUS; // Assuming MINUS as the priority
+          }
+          // Additional cases can be added here if needed
+          return pRHS; // Default case
+        }
+
+        // Handle ZERO_MINUS cases
+        if (pLHS == SignValue.ZERO_MINUS) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.ZERO) {
+            return SignValue.ZERO_MINUS; // Assuming ZERO_MINUS as the priority
+          }
+          // Additional cases can be added here if needed
+          return pRHS; // Default case
+        }
+
+        // Handle PLUS cases
+        if (pLHS == SignValue.PLUS) {
+          if (pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.MINUS || pRHS == SignValue.ZERO) {
+            return SignValue.PLUS; // Assuming PLUS as the priority
+          }
+          // Additional cases can be added here if needed
+        }
+
+        // Default case
+        return SignValue.TOP;
+
         
-        if ((pLHS == SignValue.PLUS && pRHS == SignValue.PLUS) ||
-                (pLHS == SignValue.MINUS && pRHS == SignValue.MINUS)) return SignValue.PLUS;
-        if ((pLHS == SignValue.PLUS && pRHS == SignValue.MINUS) ||
-                (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS)) return SignValue.MINUS;
-
-        return SignValue.TOP;
-
       case DIV:
-        if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
-          return  SignValue.BOTTOM;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.BOTTOM;
-        if (pRHS == SignValue.ZERO) return SignValue.BOTTOM;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) return SignValue.MINUS;
-        if (pLHS == SignValue.ZERO) return SignValue.ZERO;
-        if ((pLHS == SignValue.PLUS && pRHS == SignValue.PLUS) ||
-                (pLHS == SignValue.MINUS && pRHS == SignValue.MINUS)) return SignValue.PLUS;
-        if ((pLHS == SignValue.PLUS && pRHS == SignValue.MINUS) ||
-                (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS)) return SignValue.MINUS;
+        // Handle bottom cases
+        if (pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM)) {
+          return SignValue.BOTTOM;
+        }
 
+        // Handle uninitialized and zero cases
+        if (pLHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.ZERO) {
+          return SignValue.TOP; // Not clear what should happen in this case, returning TOP
+        }
+
+        // Handle division by zero
+        if (pRHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.TOP || pRHS == SignValue.ZERO) {
+          return SignValue.TOP; // Division by zero or uninitialized value
+        }
+
+        // Handle division by constants
+        if (pRHS == SignValue.PLUS || pRHS == SignValue.MINUS || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.ZERO_MINUS) {
+          return SignValue.PLUS_MINUS; // Division by constant can lead to positive or negative results
+        }
+
+        // Handle division by PLUS_MINUS
+        if (pRHS == SignValue.PLUS_MINUS) {
+          return SignValue.PLUS_MINUS; // Division by PLUS_MINUS can lead to positive or negative results
+        }
+
+        // Handle division by ZERO_PLUS
+        if (pRHS == SignValue.ZERO_PLUS) {
+          return SignValue.ZERO_PLUS; // Division by ZERO_PLUS will result in positive values only
+        }
+
+        // Handle division by ZERO_MINUS
+        if (pRHS == SignValue.ZERO_MINUS) {
+          return SignValue.ZERO_MINUS; // Division by ZERO_MINUS will result in negative values only
+        }
+
+        // Default case
         return SignValue.TOP;
+
 
       default:
         throw new UnsupportedOperationException("Unsupported operation: " + pOperation);
