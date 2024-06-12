@@ -217,9 +217,7 @@ public class SignTransferRelation implements TransferRelation {
           if( pRHS == SignValue.ZERO){
             return SignValue.ZERO_PLUS;
           }
-          if(pRHS == SignValue.PLUS_MINUS){
-            return  SignValue.ZERO;
-          }
+
 
           if(pRHS == SignValue.ZERO_PLUS){
             return  SignValue.ZERO_PLUS;
@@ -244,7 +242,7 @@ public class SignTransferRelation implements TransferRelation {
             return  SignValue.ZERO_PLUS;
           }
           // Additional cases can be added here if needed
-          return pRHS; // Default case
+          return SignValue.TOP; // Default case
         }
 
         // Handle PLUS cases
