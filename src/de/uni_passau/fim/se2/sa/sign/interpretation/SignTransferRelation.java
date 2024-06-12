@@ -69,18 +69,46 @@ public class SignTransferRelation implements TransferRelation {
         return  SignValue.TOP;
 
       case SUB:
-        if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
-          return  SignValue.BOTTOM;
-        if (pLHS == SignValue.ZERO && pRHS == SignValue.ZERO_PLUS ) return SignValue.ZERO_MINUS;
-        if (pLHS == SignValue.ZERO && pRHS == SignValue.PLUS_MINUS || pRHS == SignValue.ZERO && pLHS == SignValue.PLUS_MINUS ) return SignValue.PLUS_MINUS;
-        if (pLHS == SignValue.ZERO && pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.ZERO && pLHS == SignValue.ZERO_MINUS ) return SignValue.ZERO_PLUS;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS) return SignValue.MINUS;
-        if (pLHS == SignValue.ZERO && pRHS == SignValue.TOP) return SignValue.TOP;
-        if (pLHS == SignValue.ZERO) return pRHS == SignValue.ZERO ? SignValue.ZERO : pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS;
-        if (pRHS == SignValue.ZERO) return pLHS;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_PLUS) return SignValue.MINUS;
-        if (pLHS == SignValue.PLUS && pRHS == SignValue.PLUS) return SignValue.TOP;
-        if (pLHS == SignValue.MINUS && pRHS == SignValue.MINUS) return SignValue.TOP;
+        if (pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM)) {
+          return SignValue.BOTTOM;
+        }
+
+        if (pLHS == SignValue.ZERO) {
+          if (pRHS == SignValue.ZERO_PLUS) {
+            return SignValue.ZERO_MINUS;
+          }
+          if (pRHS == SignValue.PLUS_MINUS || pRHS == SignValue.ZERO_MINUS) {
+            return SignValue.PLUS_MINUS;
+          }
+
+          if(pRHS == SignValue.UNINITIALIZED_VALUE){
+            return SignValue.TOP;
+          }
+          if (pRHS == SignValue.TOP) {
+            return SignValue.TOP;
+          }
+          if (pRHS == SignValue.ZERO) {
+            return SignValue.ZERO;
+          }
+          return pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS;
+        }
+
+        if (pRHS == SignValue.ZERO) {
+          return pLHS;
+        }
+
+        if (pLHS == SignValue.MINUS) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS) {
+            return SignValue.MINUS;
+          }
+          if (pRHS == SignValue.MINUS) {
+            return SignValue.TOP;
+          }
+        }
+
+        if (pLHS == SignValue.PLUS && pRHS == SignValue.PLUS) {
+          return SignValue.TOP;
+        }
 
         return SignValue.TOP;
 
