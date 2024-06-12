@@ -165,9 +165,7 @@ public class SignTransferRelation implements TransferRelation {
         }
 
         // Handle uninitialized and zero cases
-        if (pLHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.ZERO) {
-          return SignValue.TOP; // Not clear what should happen in this case, returning TOP
-        }
+
 
         // Handle PLUS_MINUS cases
         if (pLHS == SignValue.PLUS_MINUS) {
@@ -186,15 +184,24 @@ public class SignTransferRelation implements TransferRelation {
             return pRHS;
           }
           // Additional cases can be added here if needed
-          return pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS; // Default case
+          return pRHS == SignValue.PLUS ? SignValue.ZERO : SignValue.TOP; // Default case
         }
 
         // Handle MINUS cases
         if (pLHS == SignValue.MINUS) {
-          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS ) {
+          if (pRHS == SignValue.PLUS ) {
             return SignValue.MINUS; // Assuming MINUS as the priority
           }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return SignValue.ZERO_MINUS;
+          }
           if(pRHS == SignValue.MINUS){
+            return  SignValue.PLUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
             return  SignValue.PLUS;
           }
           // Additional cases can be added here if needed
@@ -203,8 +210,17 @@ public class SignTransferRelation implements TransferRelation {
 
         // Handle ZERO_PLUS cases
         if (pLHS == SignValue.ZERO_PLUS) {
-          if (pRHS == SignValue.MINUS || pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.ZERO) {
-            return SignValue.MINUS; // Assuming MINUS as the priority
+          if (pRHS == SignValue.MINUS ) {
+            return SignValue.ZERO_MINUS;
+          }
+          if( pRHS == SignValue.ZERO_MINUS ){
+            return SignValue.ZERO_MINUS;
+          }
+          if( pRHS == SignValue.ZERO){
+            return SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
+            return  SignValue.ZERO;
           }
           // Additional cases can be added here if needed
           return pRHS; // Default case
@@ -221,9 +237,16 @@ public class SignTransferRelation implements TransferRelation {
 
         // Handle PLUS cases
         if (pLHS == SignValue.PLUS) {
-          if (pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.MINUS || pRHS == SignValue.ZERO) {
-            return SignValue.PLUS; // Assuming PLUS as the priority
+          if (pRHS == SignValue.ZERO_MINUS ) {
+            return SignValue.ZERO_MINUS; // Assuming PLUS as the priority
           }
+          if( pRHS == SignValue.MINUS){
+            return SignValue.MINUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+
           // Additional cases can be added here if needed
         }
 
@@ -237,10 +260,7 @@ public class SignTransferRelation implements TransferRelation {
           return SignValue.BOTTOM;
         }
 
-        // Handle uninitialized and zero cases
-        if (pLHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.ZERO) {
-          return SignValue.TOP; // Not clear what should happen in this case, returning TOP
-        }
+
 
         // Handle division by zero
         if (pRHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.TOP || pRHS == SignValue.ZERO) {
