@@ -71,7 +71,7 @@ public class SignTransferRelation implements TransferRelation {
       case SUB:
         if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
           return  SignValue.BOTTOM;
-        if (pLHS == SignValue.ZERO && pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.ZERO && pLHS == SignValue.ZERO_MINUS ) return SignValue.PLUS;
+        if (pLHS == SignValue.ZERO && pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.ZERO && pLHS == SignValue.ZERO_MINUS ) return SignValue.ZERO_PLUS;
         if (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS) return SignValue.MINUS;
         if (pLHS == SignValue.ZERO) return pRHS == SignValue.ZERO ? SignValue.ZERO : pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS;
         if (pRHS == SignValue.ZERO) return pLHS;
