@@ -8,28 +8,24 @@ public class SignLattice implements Lattice<SignValue> {
   /** {@inheritDoc} */
   @Override
   public SignValue top() {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    return SignValue.TOP;
   }
 
   /** {@inheritDoc} */
   @Override
   public SignValue bottom() {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    return SignValue.BOTTOM;
   }
 
   /** {@inheritDoc} */
   @Override
   public SignValue join(final SignValue pFirst, final SignValue pSecond) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    return pFirst.join(pSecond);
   }
 
   /** {@inheritDoc} */
   @Override
   public boolean isLessOrEqual(final SignValue pFirst, final SignValue pSecond) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    return pFirst.isLessOrEqual(pSecond);
   }
 }
