@@ -2,38 +2,58 @@ package de.uni_passau.fim.se2.sa.sign;
 
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
+import de.uni_passau.fim.se2.sa.sign.interpretation.SignInterpreter;
 import de.uni_passau.fim.se2.sa.sign.interpretation.SignValue;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
 
-public class SignAnalysisImpl implements SignAnalysis {
+public class SignAnalysisImpl implements SignAnalysis, Opcodes {
 
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
-      final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+          final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
+    // Read the class
+    ClassReader classReader = new ClassReader(pClassName);
+    ClassNode classNode = new ClassNode();
+    classReader.accept(classNode, 0);
+
+    // Find the method
+    MethodNode methodNode = null;
+    for (MethodNode mn : classNode.methods) {
+      if (mn.name.equals(pMethodName)) {
+        methodNode = mn;
+        break;
+      }
+    }
+    if (methodNode == null) {
+      throw new IllegalArgumentException("Method not found: " + pMethodName);
+    }
+
+    // Perform the analysis
+    SignInterpreter interpreter = new SignInterpreter();
+    Analyzer<SignValue> analyzer = new Analyzer<>(interpreter);
+    Frame<SignValue>[] frames = analyzer.analyze(pClassName, methodNode);
+
+    // Collect the analysis results
+    List<Pair<AbstractInsnNode, Frame<SignValue>>> pairs = new ArrayList<>();
+    for (int i = 0; i < methodNode.instructions.size(); i++) {
+      pairs.add(new Pair<>(methodNode.instructions.get(i), frames[i]));
+    }
+    return extractAnalysisResults(pairs);
   }
 
-  /**
-   * Extracts the analysis results from the given pairs of instructions and frames.
-   *
-   * <p>The result is a {@link SortedSetMultimap} that maps line numbers to the analysis results.
-   * For each line number, there can be multiple analysis results.  The method expects a list of
-   * pairs of instructions and frames.  The instructions are expected to be in the same order as
-   * they are in the method.  The frames are expected to be the frames that are computed for the
-   * instructions.  The method will extract the analysis results from the frames and map them to
-   * the line numbers of the instructions.
-   *
-   * @param pPairs The pairs of instructions and frames.
-   * @return The analysis results.
-   */
   private SortedSetMultimap<Integer, AnalysisResult> extractAnalysisResults(
-      final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
+          final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
     final SortedSetMultimap<Integer, AnalysisResult> result = TreeMultimap.create();
     int lineNumber = -1;
 
@@ -61,26 +81,66 @@ public class SignAnalysisImpl implements SignAnalysis {
   }
 
   private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    // Check if the instruction is a division or remainder operation
+    if (pInstruction.getOpcode() == IDIV || pInstruction.getOpcode() == LDIV ||
+            pInstruction.getOpcode() == FDIV || pInstruction.getOpcode() == DDIV ||
+            pInstruction.getOpcode() == IREM || pInstruction.getOpcode() == LREM ||
+            pInstruction.getOpcode() == FREM || pInstruction.getOpcode() == DREM) {
+      // Get the value on the stack that would be the divisor
+      SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
+      return divisor == SignValue.ZERO;
+    }
+    return false;
   }
 
   private boolean isMaybeDivByZero(
-      final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    // Check if the instruction is a division or remainder operation
+    if (pInstruction.getOpcode() == IDIV || pInstruction.getOpcode() == LDIV ||
+            pInstruction.getOpcode() == FDIV || pInstruction.getOpcode() == DDIV ||
+            pInstruction.getOpcode() == IREM || pInstruction.getOpcode() == LREM ||
+            pInstruction.getOpcode() == FREM || pInstruction.getOpcode() == DREM) {
+      // Get the value on the stack that would be the divisor
+      SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
+      return divisor == SignValue.ZERO || divisor == SignValue.ZERO_MINUS || divisor == SignValue.ZERO_PLUS;
+    }
+    return false;
   }
 
   private boolean isNegativeArrayIndex(
-      final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    // Check if the instruction is an array load or store operation
+    if (pInstruction.getOpcode() == IALOAD || pInstruction.getOpcode() == LALOAD ||
+            pInstruction.getOpcode() == FALOAD || pInstruction.getOpcode() == DALOAD ||
+            pInstruction.getOpcode() == AALOAD || pInstruction.getOpcode() == BALOAD ||
+            pInstruction.getOpcode() == CALOAD || pInstruction.getOpcode() == SALOAD ||
+            pInstruction.getOpcode() == IASTORE || pInstruction.getOpcode() == LASTORE ||
+            pInstruction.getOpcode() == FASTORE || pInstruction.getOpcode() == DASTORE ||
+            pInstruction.getOpcode() == AASTORE || pInstruction.getOpcode() == BASTORE ||
+            pInstruction.getOpcode() == CASTORE || pInstruction.getOpcode() == SASTORE) {
+      // Get the index on the stack
+      SignValue index = pFrame.getStack(pFrame.getStackSize() - 1);
+      return index == SignValue.MINUS || index == SignValue.ZERO_MINUS || index == SignValue.PLUS_MINUS;
+    }
+    return false;
   }
 
   private boolean isMaybeNegativeArrayIndex(
-      final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    // Check if the instruction is an array load or store operation
+    if (pInstruction.getOpcode() == IALOAD || pInstruction.getOpcode() == LALOAD ||
+            pInstruction.getOpcode() == FALOAD || pInstruction.getOpcode() == DALOAD ||
+            pInstruction.getOpcode() == AALOAD || pInstruction.getOpcode() == BALOAD ||
+            pInstruction.getOpcode() == CALOAD || pInstruction.getOpcode() == SALOAD ||
+            pInstruction.getOpcode() == IASTORE || pInstruction.getOpcode() == LASTORE ||
+            pInstruction.getOpcode() == FASTORE || pInstruction.getOpcode() == DASTORE ||
+            pInstruction.getOpcode() == AASTORE || pInstruction.getOpcode() == BASTORE ||
+            pInstruction.getOpcode() == CASTORE || pInstruction.getOpcode() == SASTORE) {
+      // Get the index on the stack
+      SignValue index = pFrame.getStack(pFrame.getStackSize() - 1);
+      return index == SignValue.MINUS || index == SignValue.ZERO_MINUS || index == SignValue.PLUS_MINUS || index == SignValue.TOP;
+    }
+    return false;
   }
 
   private record Pair<K, V>(K key, V value) {
