@@ -28,6 +28,9 @@ public class SignTransferRelation implements TransferRelation {
           case ZERO_MINUS -> SignValue.ZERO_PLUS;
           case PLUS_MINUS -> SignValue.PLUS_MINUS;
           case TOP -> SignValue.TOP;
+          case BOTTOM -> SignValue.BOTTOM;
+          case UNINITIALIZED_VALUE -> SignValue.UNINITIALIZED_VALUE;
+
           default -> throw new UnsupportedOperationException("Unsupported value: " + pValue);
       };
   }
@@ -70,7 +73,7 @@ public class SignTransferRelation implements TransferRelation {
         return SignValue.TOP;
 
       case DIV:
-        if (pRHS == SignValue.ZERO) throw new ArithmeticException("Division by zero");
+        if (pRHS == SignValue.ZERO) return SignValue.BOTTOM;
         if (pLHS == SignValue.ZERO) return SignValue.ZERO;
         if ((pLHS == SignValue.PLUS && pRHS == SignValue.PLUS) ||
                 (pLHS == SignValue.MINUS && pRHS == SignValue.MINUS)) return SignValue.PLUS;
