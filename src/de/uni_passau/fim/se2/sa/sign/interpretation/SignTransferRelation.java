@@ -229,6 +229,9 @@ public class SignTransferRelation implements TransferRelation {
           if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.ZERO) {
             return SignValue.ZERO_MINUS; // Assuming ZERO_MINUS as the priority
           }
+          if(pRHS == SignValue.MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
           // Additional cases can be added here if needed
           return pRHS; // Default case
         }
@@ -243,6 +246,12 @@ public class SignTransferRelation implements TransferRelation {
           }
           if(pRHS == SignValue.ZERO){
             return  SignValue.ZERO;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
+            return  SignValue.MINUS;
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return  SignValue.ZERO_PLUS;
           }
 
           // Additional cases can be added here if needed
