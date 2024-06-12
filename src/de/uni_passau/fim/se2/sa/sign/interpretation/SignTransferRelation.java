@@ -257,6 +257,13 @@ public class SignTransferRelation implements TransferRelation {
            return  SignValue.ZERO;
          }
         }
+
+        if(pLHS == SignValue.UNINITIALIZED_VALUE) {// Handle PLUS cases
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+        }
+
         if (pLHS == SignValue.PLUS) {
           if (pRHS == SignValue.ZERO_MINUS ) {
             return SignValue.ZERO_MINUS; // Assuming PLUS as the priority
