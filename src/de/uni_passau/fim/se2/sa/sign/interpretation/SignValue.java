@@ -11,7 +11,7 @@ public enum SignValue implements Value {
   MINUS("{–}"), // 1
   ZERO("{0}"), // 2
   ZERO_MINUS("{0,–}"), // 3 == ZERO | MINUS
-  PLUS("{+}"), // 4 == 4
+  PLUS("{+}"), // 4 == PLUS
   PLUS_MINUS("{+,–}"), // 5 == PLUS | MINUS
   ZERO_PLUS("{0,+}"), // 6 == ZERO | PLUS
   TOP("⊤"), // 7 == MINUS | ZERO | PLUS
@@ -35,39 +35,40 @@ public enum SignValue implements Value {
 
   public SignValue join(final SignValue pOther) {
     Preconditions.checkState(
-        this != UNINITIALIZED_VALUE && pOther != UNINITIALIZED_VALUE,
-        "Dummy shall not be used as a value.");
+            this != UNINITIALIZED_VALUE && pOther != UNINITIALIZED_VALUE,
+            "Dummy shall not be used as a value.");
 
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    int thisOrdinal = this.ordinal();
+    int otherOrdinal = pOther.ordinal();
+
+    // The join operation corresponds to the bitwise OR operation of their ordinal values
+    return SignValue.values()[thisOrdinal | otherOrdinal];
   }
 
   public boolean isLessOrEqual(final SignValue pOther) {
     Preconditions.checkState(
-        this != UNINITIALIZED_VALUE && pOther != UNINITIALIZED_VALUE,
-        "Dummy shall not be used as a value.");
-
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+            this != UNINITIALIZED_VALUE && pOther != UNINITIALIZED_VALUE,
+            "Dummy shall not be used as a value.");
+    return (this.ordinal() & pOther.ordinal()) == this.ordinal();
   }
 
   public static boolean isZero(final SignValue pValue) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    Preconditions.checkState(pValue != UNINITIALIZED_VALUE, "Dummy shall not be used as a value.");
+    return pValue == ZERO;
   }
 
   public static boolean isMaybeZero(final SignValue pValue) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    Preconditions.checkState(pValue != UNINITIALIZED_VALUE, "Dummy shall not be used as a value.");
+    return pValue == ZERO || pValue == ZERO_MINUS || pValue == ZERO_PLUS || pValue == TOP;
   }
 
   public static boolean isNegative(final SignValue pValue) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    Preconditions.checkState(pValue != UNINITIALIZED_VALUE, "Dummy shall not be used as a value.");
+    return pValue == MINUS;
   }
 
   public static boolean isMaybeNegative(final SignValue pValue) {
-    // TODO Implement me
-    throw new UnsupportedOperationException("Implement me");
+    Preconditions.checkState(pValue != UNINITIALIZED_VALUE, "Dummy shall not be used as a value.");
+    return pValue == MINUS || pValue == ZERO_MINUS || pValue == PLUS_MINUS || pValue == TOP;
   }
 }
