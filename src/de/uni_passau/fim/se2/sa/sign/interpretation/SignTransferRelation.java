@@ -69,6 +69,8 @@ public class SignTransferRelation implements TransferRelation {
         return  SignValue.TOP;
 
       case SUB:
+        if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
+          return  SignValue.BOTTOM;
         if (pLHS == SignValue.ZERO) return pRHS == SignValue.ZERO ? SignValue.ZERO : pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS;
         if (pRHS == SignValue.ZERO) return pLHS;
         if (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) return SignValue.PLUS_MINUS;
@@ -81,6 +83,8 @@ public class SignTransferRelation implements TransferRelation {
         return SignValue.TOP;
 
       case MUL:
+        if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
+          return  SignValue.BOTTOM;
         if (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) return SignValue.PLUS_MINUS;
         if (pRHS == SignValue.MINUS && pLHS == SignValue.PLUS_MINUS) return SignValue.PLUS_MINUS;
         if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.ZERO;
@@ -94,6 +98,8 @@ public class SignTransferRelation implements TransferRelation {
         return SignValue.TOP;
 
       case DIV:
+        if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
+          return  SignValue.BOTTOM;
         if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.BOTTOM;
         if (pRHS == SignValue.ZERO) return SignValue.BOTTOM;
         if (pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) return SignValue.MINUS;
