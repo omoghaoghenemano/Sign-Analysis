@@ -191,8 +191,11 @@ public class SignTransferRelation implements TransferRelation {
 
         // Handle MINUS cases
         if (pLHS == SignValue.MINUS) {
-          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.MINUS) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS ) {
             return SignValue.MINUS; // Assuming MINUS as the priority
+          }
+          if(pRHS == SignValue.MINUS){
+            return  SignValue.PLUS;
           }
           // Additional cases can be added here if needed
           return SignValue.TOP; // Default case
@@ -227,7 +230,7 @@ public class SignTransferRelation implements TransferRelation {
         // Default case
         return SignValue.TOP;
 
-        
+
       case DIV:
         // Handle bottom cases
         if (pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM)) {
