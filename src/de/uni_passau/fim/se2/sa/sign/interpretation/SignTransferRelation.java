@@ -50,6 +50,8 @@ public class SignTransferRelation implements TransferRelation {
       case ADD:
         if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
           return  SignValue.BOTTOM;
+        if(pLHS.equals(SignValue.ZERO_PLUS) && pRHS.equals(SignValue.ZERO_PLUS))
+          return  SignValue.ZERO_PLUS;
         if (pLHS == SignValue.ZERO && pRHS == SignValue.UNINITIALIZED_VALUE) return  SignValue.TOP;
         if (pLHS == SignValue.ZERO) return pRHS;
         if (pRHS == SignValue.ZERO) return pLHS;
