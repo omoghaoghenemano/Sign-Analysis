@@ -226,11 +226,15 @@ public class SignTransferRelation implements TransferRelation {
 
         // Handle ZERO_MINUS cases
         if (pLHS == SignValue.ZERO_MINUS) {
-          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.ZERO) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS ) {
             return SignValue.ZERO_MINUS; // Assuming ZERO_MINUS as the priority
           }
           if(pRHS == SignValue.MINUS){
             return  SignValue.ZERO_PLUS;
+          }
+
+          if( pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
           }
           // Additional cases can be added here if needed
           return pRHS; // Default case
