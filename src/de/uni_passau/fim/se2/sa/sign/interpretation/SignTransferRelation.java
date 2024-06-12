@@ -107,6 +107,9 @@ public class SignTransferRelation implements TransferRelation {
           if (pRHS == SignValue.MINUS) {
             return SignValue.TOP;
           }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.MINUS;
+          }
         }
 
         if(pLHS == SignValue.ZERO_PLUS){
