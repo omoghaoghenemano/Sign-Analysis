@@ -25,9 +25,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
   public String add(List<Pair<AbstractInsnNode, Frame<SignValue>>> elements) {
-    if (elements == null || elements.isEmpty()) {
-      return "No warnings or errors found";
-    }
 
     StringBuilder result = new StringBuilder();
     int lineNumber = -1;
