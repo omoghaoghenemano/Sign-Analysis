@@ -133,18 +133,36 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
-
+  /**
+   * Checks if the instruction causes a division by zero.
+   *
+   * @param instruction The instruction node.
+   * @param frame       The frame containing sign values.
+   * @return True if the instruction causes division by zero, false otherwise.
+   */
   private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IDIV) {
+    if (instruction.getOpcode() == Opcodes.IDIV ||
+            instruction.getOpcode() == Opcodes.LDIV ||
+            instruction.getOpcode() == Opcodes.FDIV ||
+            instruction.getOpcode() == Opcodes.DDIV) {
       SignValue divisor = frame.getStack(frame.getStackSize() - 1);
       return divisor == SignValue.ZERO;
     }
     return false;
   }
 
-
+  /**
+   * Checks if the instruction might cause a division by zero.
+   *
+   * @param instruction The instruction node.
+   * @param frame       The frame containing sign values.
+   * @return True if the instruction might cause division by zero, false otherwise.
+   */
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IDIV) {
+    if (instruction.getOpcode() == Opcodes.IDIV ||
+            instruction.getOpcode() == Opcodes.LDIV ||
+            instruction.getOpcode() == Opcodes.FDIV ||
+            instruction.getOpcode() == Opcodes.DDIV) {
       if (frame.getStackSize() > 0) {
         SignValue divisor = frame.getStack(frame.getStackSize() - 1);
         return divisor == SignValue.ZERO ||
@@ -153,11 +171,23 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
       }
     }
     return false;
-  } 
+  }
 
-
+  /**
+   * Checks if the instruction causes a negative array index.
+   *
+   * @param instruction The instruction node.
+   * @param frame       The frame containing sign values.
+   * @return True if the instruction causes negative array index, false otherwise.
+   */
   private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IALOAD) {
+    if (instruction.getOpcode() == Opcodes.IALOAD ||
+            instruction.getOpcode() == Opcodes.LALOAD ||
+            instruction.getOpcode() == Opcodes.FALOAD ||
+            instruction.getOpcode() == Opcodes.DALOAD ||
+            instruction.getOpcode() == Opcodes.BALOAD ||
+            instruction.getOpcode() == Opcodes.CALOAD ||
+            instruction.getOpcode() == Opcodes.SALOAD) {
       if (frame.getStackSize() > 0) {
         SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
         return indexValue == SignValue.MINUS ||
@@ -168,9 +198,21 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return false;
   }
 
-  /** {@inheritDoc} */
+  /**
+   * Checks if the instruction might cause a negative array index.
+   *
+   * @param instruction The instruction node.
+   * @param frame       The frame containing sign values.
+   * @return True if the instruction might cause negative array index, false otherwise.
+   */
   private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IALOAD) {
+    if (instruction.getOpcode() == Opcodes.IALOAD ||
+            instruction.getOpcode() == Opcodes.LALOAD ||
+            instruction.getOpcode() == Opcodes.FALOAD ||
+            instruction.getOpcode() == Opcodes.DALOAD ||
+            instruction.getOpcode() == Opcodes.BALOAD ||
+            instruction.getOpcode() == Opcodes.CALOAD ||
+            instruction.getOpcode() == Opcodes.SALOAD) {
       if (frame.getStackSize() > 0) {
         SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
         return indexValue == SignValue.MINUS ||
@@ -181,7 +223,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     }
     return false;
   }
-
 
 
 

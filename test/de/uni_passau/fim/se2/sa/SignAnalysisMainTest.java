@@ -29,8 +29,8 @@ public class SignAnalysisMainTest {
     public void testCall_withValidArguments() throws Exception {
         // Given
 
-        signAnalysisMain.setClassName("de.uni_passau.fim.se2.sa.sign.interpretation.SignInterpreter");
-        signAnalysisMain.setMethodName("unaryOperation");
+        signAnalysisMain.setClassName("de.uni_passau.fim.se2.sa.sign.SignAnalysisImpl");
+        signAnalysisMain.setMethodName("analyse");
 
         // When
         Callable<Integer> callable = signAnalysisMain;
