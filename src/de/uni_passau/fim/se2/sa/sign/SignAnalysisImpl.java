@@ -134,15 +134,22 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
-  private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction causes a division by zero
-    if (pInstruction.getOpcode() == Opcodes.IDIV || pInstruction.getOpcode() == Opcodes.LDIV ||
-            pInstruction.getOpcode() == Opcodes.FDIV || pInstruction.getOpcode() == Opcodes.DDIV) {
-      // For integer, long, float, or double division
-      SignValue divisor = getDivisorValue(pInstruction, pFrame);
-      return SignValue.isZero(divisor); // Check if the divisor is zero
+
+  private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == Opcodes.IDIV || instruction.getOpcode() == Opcodes.LDIV ||
+            instruction.getOpcode() == Opcodes.FDIV || instruction.getOpcode() == Opcodes.DDIV) {
+      int stackSize = frame.getStackSize();
+      if (stackSize >= 2) { // Ensure there are enough operands on the stack
+
+        SignValue denominator = frame.getStack(stackSize - 2);
+
+        // Check if the denominator (second top of stack) is zero
+        if (denominator == SignValue.ZERO) {
+          return true; // Division by zero detected
+        }
+      }
     }
-    return false;
+    return false; // No division by zero detected
   }
 
   private boolean isMaybeDivByZero(
