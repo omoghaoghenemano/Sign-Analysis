@@ -45,7 +45,7 @@ public class SignAnalysisImplTest {
     @Test
     public void testAnalyse() throws AnalyzerException, IOException {
         String className = "de.uni_passau.fim.se2.sa.sign.SignAnalysisImpl";
-        String methodName = "add";
+        String methodName = "isDivByZero";
 
         SignAnalysisImpl analysis = new SignAnalysisImpl();
         SortedSetMultimap<Integer, AnalysisResult> results = analysis.analyse(className, methodName);
