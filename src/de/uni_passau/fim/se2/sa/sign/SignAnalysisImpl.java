@@ -22,8 +22,13 @@ import org.objectweb.asm.tree.analysis.Frame;
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
- 
 
+  public int add() {
+    int a = 1;
+    int b = 2;
+    int c = a + b;
+    return c;
+  }
   
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(

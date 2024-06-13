@@ -15,7 +15,7 @@ public class SignAnalysisImplTest {
 
     @Test
     public void testAnalyse() throws AnalyzerException, IOException {
-        String className = "de.uni_passau.fim.se2.sa.examples.PublicFunctional";
+        String className = "de.uni_passau.fim.se2.sa.sign.SignAnalysisImpl";
         String methodName = "add";
 
         SignAnalysisImpl analysis = new SignAnalysisImpl();
