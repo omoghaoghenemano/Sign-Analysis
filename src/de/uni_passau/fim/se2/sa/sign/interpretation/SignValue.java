@@ -35,17 +35,17 @@ public enum SignValue implements Value {
   }
 
   public SignValue join(final SignValue pOther) {
-    Preconditions.checkState(
-            this != UNINITIALIZED_VALUE && pOther != UNINITIALIZED_VALUE,
-            "Dummy shall not be used as a value.");
+    if (this == UNINITIALIZED_VALUE || pOther == UNINITIALIZED_VALUE) {
+        // Handle special case where one of the values is UNINITIALIZED_VALUE
+        return UNINITIALIZED_VALUE;
+    }
 
     int thisOrdinal = this.ordinal();
     int otherOrdinal = pOther.ordinal();
 
     // The join operation corresponds to the bitwise OR operation of their ordinal values
     return SignValue.values()[thisOrdinal | otherOrdinal];
-  }
-
+}
   public boolean isLessOrEqual(final SignValue pOther) {
     Preconditions.checkState(
             this != UNINITIALIZED_VALUE && pOther != UNINITIALIZED_VALUE,
