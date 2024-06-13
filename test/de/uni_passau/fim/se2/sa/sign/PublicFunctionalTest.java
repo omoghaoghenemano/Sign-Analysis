@@ -1,5 +1,6 @@
-package de.uni_passau.fim.se2.sa.examples;
+package de.uni_passau.fim.se2.sa.sign;
 
+import de.uni_passau.fim.se2.sa.examples.PublicFunctional;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

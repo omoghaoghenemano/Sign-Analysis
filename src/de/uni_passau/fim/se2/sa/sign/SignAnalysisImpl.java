@@ -2,6 +2,7 @@ package de.uni_passau.fim.se2.sa.sign;
 
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
+import de.uni_passau.fim.se2.sa.examples.PublicFunctional;
 import de.uni_passau.fim.se2.sa.sign.interpretation.SignInterpreter;
 import de.uni_passau.fim.se2.sa.sign.interpretation.SignValue;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
 
-public class SignAnalysisImpl implements SignAnalysis, Opcodes {
+public class SignAnalysisImpl extends PublicFunctional implements SignAnalysis, Opcodes {
 
 
   @Override
@@ -35,6 +36,7 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
         break;
       }
     }
+
 
     if (targetMethod == null) {
       throw new IllegalArgumentException("Method not found: " + pMethodName);
