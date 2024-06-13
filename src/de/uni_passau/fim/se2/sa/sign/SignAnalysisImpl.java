@@ -146,7 +146,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
             instruction.getOpcode() == Opcodes.FDIV ||
             instruction.getOpcode() == Opcodes.DDIV) {
       SignValue divisor = frame.getStack(frame.getStackSize() - 1);
-      return divisor == SignValue.ZERO;
+      return SignValue.isZero(divisor);
     }
     return false;
   }
@@ -165,9 +165,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
             instruction.getOpcode() == Opcodes.DDIV) {
       if (frame.getStackSize() > 0) {
         SignValue divisor = frame.getStack(frame.getStackSize() - 1);
-        return divisor == SignValue.ZERO ||
-                divisor == SignValue.ZERO_MINUS ||
-                divisor == SignValue.ZERO_PLUS;
+        return SignValue.isMaybeZero(divisor);
       }
     }
     return false;
@@ -190,9 +188,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
             instruction.getOpcode() == Opcodes.SALOAD) {
       if (frame.getStackSize() > 0) {
         SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
-        return indexValue == SignValue.MINUS ||
-
-                indexValue == SignValue.PLUS_MINUS;
+        return SignValue.isNegative(indexValue);
       }
     }
     return false;
@@ -215,10 +211,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
             instruction.getOpcode() == Opcodes.SALOAD) {
       if (frame.getStackSize() > 0) {
         SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
-        return indexValue == SignValue.MINUS ||
-                indexValue == SignValue.ZERO_MINUS ||
-                indexValue == SignValue.PLUS_MINUS ||
-                indexValue == SignValue.TOP;
+        return SignValue.isMaybeNegative(indexValue);
       }
     }
     return false;
