@@ -21,38 +21,22 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
-  public String add(List<Pair<AbstractInsnNode, Frame<SignValue>>> elements) {
-    System.out.println("what is in element:"+elements);
-    if (elements == null || elements.isEmpty()) {
-      return "No warnings or errors found";
+  public String add() {
+    System.out.println("Analyzing add() method:");
+    PublicFunctional pf = new PublicFunctional();
+
+    // Perform bytecode analysis for the add() method
+    String result = "";
+    try {
+      result = analyse("de/uni_passau/fim/se2/sa/examples/PublicFunctional", "add").toString();
+    } catch (AnalyzerException | IOException e) {
+      e.printStackTrace();
     }
+    System.out.println(add()+"check add");
 
-    StringBuilder result = new StringBuilder();
-    int lineNumber = -1;
-
-    for (Pair<AbstractInsnNode, Frame<SignValue>> pair : elements) {
-      AbstractInsnNode instruction = pair.key();
-      Frame<SignValue> frame = pair.value();
-
-      if (instruction instanceof LineNumberNode) {
-        lineNumber = ((LineNumberNode) instruction).line;
-      }
-
-      if (isDivByZero(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ERROR: Division by Zero detected\n");
-      } else if (isMaybeDivByZero(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": WARNING: Division by Zero detected\n");
-      }
-
-      if (isNegativeArrayIndex(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ERROR: Negative Array Index detected\n");
-      } else if (isMaybeNegativeArrayIndex(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": WARNING: Negative Array Index detected\n");
-      }
-    }
-
-    return result.toString().trim(); // Remove the trailing newline
+    return result;
   }
+
 
 
 
@@ -99,9 +83,25 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
       }
     }
 
-    return extractAnalysisResults(pairs);
+    // Include analysis for PublicFunctional methods
+    if (pClassName.equals("de/uni_passau/fim/se2/sa/examples/PublicFunctional")) {
+      PublicFunctional pf = new PublicFunctional();
+      if (pMethodName.equals("add")) {
+        int addAnalysisResult = pf.add();
+        // Process addAnalysisResult if needed
+      } else if (pMethodName.equals("div")) {
+        int divAnalysisResult = pf.div();
 
+
+        // Process divAnalysisResult if needed
+      }
+      // Add more checks for other methods in PublicFunctional as required
+    }
+
+    return extractAnalysisResults(pairs);
   }
+
+
 
   private SortedSetMultimap<Integer, AnalysisResult> extractAnalysisResults(
           final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
