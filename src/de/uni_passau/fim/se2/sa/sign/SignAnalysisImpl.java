@@ -133,20 +133,30 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
-
   private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
     if (instruction.getOpcode() == IDIV) {
-      SignValue divisor = frame.getStack(frame.getStackSize() - 1);
-      return divisor == SignValue.ZERO;
+      int stackSize = frame.getStackSize();
+      if (stackSize >= 2) { // Ensure there are enough operands on the stack
+        SignValue divisor = frame.getStack(stackSize - 1);
+        SignValue denominator = frame.getStack(stackSize - 2);
+
+        // Check if the denominator (second top of stack) is zero
+        if (denominator == SignValue.ZERO) {
+          return true; // Division by zero detected
+        }
+      }
     }
-    return false;
+    return false; // No division by zero detected
   }
 
 
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
     if (instruction.getOpcode() == IDIV) {
-      if (frame.getStackSize() > 0) {
-        SignValue divisor = frame.getStack(frame.getStackSize() - 1);
+      int stackSize = frame.getStackSize();
+      if (stackSize > 0) { // Ensure there are operands on the stack
+        SignValue divisor = frame.getStack(stackSize - 1);
+
+        // Check if the divisor is potentially zero, zero minus, or zero plus
         return divisor == SignValue.ZERO ||
                 divisor == SignValue.ZERO_MINUS ||
                 divisor == SignValue.ZERO_PLUS;
@@ -156,10 +166,14 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
   }
 
 
+
   private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
     if (instruction.getOpcode() == IALOAD) {
-      if (frame.getStackSize() > 0) {
-        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
+      int stackSize = frame.getStackSize();
+      if (stackSize > 0) { // Ensure there are operands on the stack
+        SignValue indexValue = frame.getStack(stackSize - 1);
+
+        // Check if the index value is negative, zero minus, or plus minus
         return indexValue == SignValue.MINUS ||
                 indexValue == SignValue.ZERO_MINUS ||
                 indexValue == SignValue.PLUS_MINUS;
@@ -168,10 +182,14 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return false;
   }
 
+
   private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
     if (instruction.getOpcode() == IALOAD) {
-      if (frame.getStackSize() > 0) {
-        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
+      int stackSize = frame.getStackSize();
+      if (stackSize > 0) { // Ensure there are operands on the stack
+        SignValue indexValue = frame.getStack(stackSize - 1);
+
+        // Check if the index value is potentially negative, zero minus, plus minus, or top
         return indexValue == SignValue.MINUS ||
                 indexValue == SignValue.ZERO_MINUS ||
                 indexValue == SignValue.PLUS_MINUS ||
@@ -180,6 +198,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     }
     return false;
   }
+
 
 
 
