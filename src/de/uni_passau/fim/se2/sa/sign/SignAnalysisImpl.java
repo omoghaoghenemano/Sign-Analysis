@@ -23,18 +23,20 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
 
-  public static String add(List<Pair<String, String>> elements) {
-    if (elements == null || elements.isEmpty()) {
-      return "No warnings or errors found";
+
+    public static String add(List<Pair<String, String>> elements) {
+      if (elements == null || elements.isEmpty()) {
+        return "No warnings or errors found";
+      }
+
+      StringBuilder result = new StringBuilder();
+      for (Pair<String, String> pair : elements) {
+        result.append(pair.key()).append(": ").append(pair.value()).append("\n");
+      }
+
+      return result.toString().trim(); // Remove the trailing newline
     }
 
-    StringBuilder result = new StringBuilder("No warnings or errors found");
-    for (Pair<String, String> pair : elements) {
-      result.append("\n").append(pair.value());
-    }
-
-    return result.toString();
-  }
 
 
 
