@@ -21,47 +21,39 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
-
-
-
-  public String add(List<Pair<AbstractInsnNode, Frame<SignValue>>> elements) {
-
-    StringBuilder result = new StringBuilder();
+  private SortedSetMultimap<Integer, AnalysisResult> add(
+          final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
+    final SortedSetMultimap<Integer, AnalysisResult> result = TreeMultimap.create();
     int lineNumber = -1;
 
-    for (Pair<AbstractInsnNode, Frame<SignValue>> pair : elements) {
-      AbstractInsnNode instruction = pair.key();
-      Frame<SignValue> frame = pair.value();
-
-      if (instruction instanceof LineNumberNode) {
-        lineNumber = ((LineNumberNode) instruction).line;
+    for (final Pair<AbstractInsnNode, Frame<SignValue>> pair : pPairs) {
+      final AbstractInsnNode instruction = pair.key();
+      final Frame<SignValue> frame = pair.value();
+      if (instruction instanceof LineNumberNode lineNumberNode) {
+        lineNumber = lineNumberNode.line;
       }
 
       if (isDivByZero(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.DIVISION_BY_ZERO.getValue()).append("\n");
+        result.put(lineNumber, AnalysisResult.DIVISION_BY_ZERO);
       } else if (isMaybeDivByZero(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.MAYBE_DIVISION_BY_ZERO.getValue()).append("\n");
+        result.put(lineNumber, AnalysisResult.MAYBE_DIVISION_BY_ZERO);
       }
 
       if (isNegativeArrayIndex(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.NEGATIVE_ARRAY_INDEX.getValue()).append("\n");
+        result.put(lineNumber, AnalysisResult.NEGATIVE_ARRAY_INDEX);
       } else if (isMaybeNegativeArrayIndex(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.MAYBE_NEGATIVE_ARRAY_INDEX.getValue()).append("\n");
+        result.put(lineNumber, AnalysisResult.MAYBE_NEGATIVE_ARRAY_INDEX);
       }
 
-      if (isAddition(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": INFO: Addition operation\n");
-      }
-    }
-    if (result.length() == 0) {
-      return "No warnings or errors found";
     }
 
 
-    return result.toString().trim(); // Remove the trailing newline
+    return result;
+
   }
 
 
+  
 
 
 
@@ -140,7 +132,8 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
   private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
     return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
             frame.getStackSize() > 0 &&
-            frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO;
+            frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO ;
+
   }
 
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
