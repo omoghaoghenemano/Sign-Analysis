@@ -50,11 +50,8 @@ public enum SignValue implements Value {
     Preconditions.checkState(
             this != UNINITIALIZED_VALUE && pOther != UNINITIALIZED_VALUE,
             "Dummy shall not be used as a value.");
-
-    // Compare ordinal values
-    return (this.ordinal() <= pOther.ordinal());
+    return (this.ordinal() & pOther.ordinal()) == this.ordinal();
   }
-
 
   public static boolean isZero(final SignValue pValue) {
     Preconditions.checkState(pValue != UNINITIALIZED_VALUE, "Dummy shall not be used as a value.");
