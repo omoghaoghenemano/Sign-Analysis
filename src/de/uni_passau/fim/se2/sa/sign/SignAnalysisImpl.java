@@ -21,39 +21,40 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
-  private SortedSetMultimap<Integer, AnalysisResult> add(
-          final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
-    final SortedSetMultimap<Integer, AnalysisResult> result = TreeMultimap.create();
+  public String add(List<Pair<AbstractInsnNode, Frame<SignValue>>> elements) {
+    if (elements == null || elements.isEmpty()) {
+      return "No warnings or errors found";
+    }
+
+    StringBuilder result = new StringBuilder();
     int lineNumber = -1;
 
-    for (final Pair<AbstractInsnNode, Frame<SignValue>> pair : pPairs) {
-      final AbstractInsnNode instruction = pair.key();
-      final Frame<SignValue> frame = pair.value();
-      if (instruction instanceof LineNumberNode lineNumberNode) {
-        lineNumber = lineNumberNode.line;
+    for (Pair<AbstractInsnNode, Frame<SignValue>> pair : elements) {
+      AbstractInsnNode instruction = pair.key();
+      Frame<SignValue> frame = pair.value();
+
+      if (instruction instanceof LineNumberNode) {
+        lineNumber = ((LineNumberNode) instruction).line;
       }
 
       if (isDivByZero(instruction, frame)) {
-        result.put(lineNumber, AnalysisResult.DIVISION_BY_ZERO);
+        result.append("Line ").append(lineNumber).append(": ERROR: Division by Zero detected\n");
       } else if (isMaybeDivByZero(instruction, frame)) {
-        result.put(lineNumber, AnalysisResult.MAYBE_DIVISION_BY_ZERO);
+        result.append("Line ").append(lineNumber).append(": WARNING: Division by Zero detected\n");
       }
 
       if (isNegativeArrayIndex(instruction, frame)) {
-        result.put(lineNumber, AnalysisResult.NEGATIVE_ARRAY_INDEX);
+        result.append("Line ").append(lineNumber).append(": ERROR: Negative Array Index detected\n");
       } else if (isMaybeNegativeArrayIndex(instruction, frame)) {
-        result.put(lineNumber, AnalysisResult.MAYBE_NEGATIVE_ARRAY_INDEX);
+        result.append("Line ").append(lineNumber).append(": WARNING: Negative Array Index detected\n");
       }
-
     }
 
-
-    return result;
-
+    return result.toString().trim(); // Remove the trailing newline
   }
 
 
-  
+
 
 
 
@@ -129,11 +130,16 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
-  private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
-            frame.getStackSize() > 0 &&
-            frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO ;
-
+  private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    // Check if the instruction is a division or remainder operation
+    System.out.println("Analyzing instruction: " + pInstruction);
+    System.out.println("Frame state: " + pFrame);
+    if (pInstruction.getOpcode() == IDIV || pInstruction.getOpcode() == IREM) {
+      // Get the value on the stack that would be the divisor
+      SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
+      return divisor == SignValue.ZERO;
+    }
+    return false;
   }
 
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {

@@ -42,4 +42,4 @@ public class SignAnalysisMainTest {
         assertTrue(output.contains("No warnings or errors found")); // Assuming no results expected in this basic test
     }
 
-}
+ }
