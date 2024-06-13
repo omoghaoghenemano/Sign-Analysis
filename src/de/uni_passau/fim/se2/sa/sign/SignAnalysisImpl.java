@@ -21,27 +21,6 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
-  public String add() {
-    System.out.println("Analyzing add() method:");
-    PublicFunctional pf = new PublicFunctional();
-
-    // Perform bytecode analysis for the add() method
-    String result = "";
-    try {
-      result = analyse("de/uni_passau/fim/se2/sa/examples/PublicFunctional", "add").toString();
-    } catch (AnalyzerException | IOException e) {
-      e.printStackTrace();
-    }
-    System.out.println(add()+"check add");
-
-    return result;
-  }
-
-
-
-
-
-
 
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
