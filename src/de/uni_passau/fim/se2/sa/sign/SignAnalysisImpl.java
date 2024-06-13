@@ -135,75 +135,55 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
   }
 
   private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    int opcode = pInstruction.getOpcode();
-    if (opcode == Opcodes.IDIV || opcode == Opcodes.LDIV ||
-            opcode == Opcodes.FDIV || opcode == Opcodes.DDIV) {
-
-      // Check divisor value on stack
-      if (pFrame.getStack(pFrame.getStackSize() - 2) == SignValue.ZERO) {
-        return true;
-      }
+    // Check if the instruction causes a division by zero
+    if (pInstruction.getOpcode() == Opcodes.IDIV || pInstruction.getOpcode() == Opcodes.LDIV ||
+            pInstruction.getOpcode() == Opcodes.FDIV || pInstruction.getOpcode() == Opcodes.DDIV) {
+      // For integer, long, float, or double division
+      SignValue divisor = getDivisorValue(pInstruction, pFrame);
+      return SignValue.isZero(divisor); // Check if the divisor is zero
     }
     return false;
   }
-
 
   private boolean isMaybeDivByZero(
           final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    int opcode = pInstruction.getOpcode();
-    if (opcode >= Opcodes.IADD && opcode <= Opcodes.DADD) {
-      // Check if any operand might be zero
-      int numOperands = Type.getArgumentTypes(pFrame.toString()).length;
-      for (int i = 0; i < numOperands; i++) {
-        if (pFrame.getStack(pFrame.getStackSize() - numOperands + i) == SignValue.ZERO) {
-          return true;
-        }
-      }
+    // Check if the instruction might cause a division by zero
+    if (pInstruction.getOpcode() == Opcodes.IDIV || pInstruction.getOpcode() == Opcodes.LDIV ||
+            pInstruction.getOpcode() == Opcodes.FDIV || pInstruction.getOpcode() == Opcodes.DDIV) {
+      // For integer, long, float, or double division
+      SignValue divisor = getDivisorValue(pInstruction, pFrame);
+      return SignValue.isMaybeZero(divisor); // Check if the divisor might be zero
     }
     return false;
   }
 
-
-
+  private SignValue getDivisorValue(AbstractInsnNode pInstruction, Frame<SignValue> pFrame) {
+    int stackSize = pFrame.getStackSize();
+    // For most divisions, the divisor is the second item on the stack
+    return pFrame.getStack(stackSize - 2);
+  }
 
   private boolean isNegativeArrayIndex(
           final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    int opcode = pInstruction.getOpcode();
-    if (opcode == Opcodes.IALOAD || opcode == Opcodes.LALOAD ||
-            opcode == Opcodes.FALOAD || opcode == Opcodes.DALOAD ||
-            opcode == Opcodes.AALOAD || opcode == Opcodes.BALOAD ||
-            opcode == Opcodes.CALOAD || opcode == Opcodes.SALOAD) {
-
-      // Check array index
-      if (pFrame.getStack(pFrame.getStackSize() - 1) == SignValue.MINUS) {
-        return true;
-      }
+    // Check if the instruction causes a negative array index
+    if (pInstruction.getOpcode() == Opcodes.ARRAYLENGTH) {
+      SignValue arraySize = pFrame.getStack(pFrame.getStackSize() - 1); // Array size on the stack
+      return SignValue.isNegative(arraySize); // Check if the array size is negative
     }
     return false;
   }
 
-
-  private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IALOAD) {
-      int stackSize = frame.getStackSize();
-      if (stackSize > 0) { // Ensure there are operands on the stack
-        SignValue indexValue = frame.getStack(stackSize - 2);
-
-        // Check if the index value is potentially negative, zero minus, plus minus, or top
-        return indexValue == SignValue.MINUS ||
-                indexValue == SignValue.ZERO_MINUS ||
-                indexValue == SignValue.PLUS_MINUS ||
-                indexValue == SignValue.TOP;
-      }
+  private boolean isMaybeNegativeArrayIndex(
+          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    // Check if the instruction might cause a negative array index
+    if (pInstruction.getOpcode() == Opcodes.ARRAYLENGTH) {
+      SignValue arraySize = pFrame.getStack(pFrame.getStackSize() - 1); // Array size on the stack
+      return SignValue.isMaybeNegative(arraySize); // Check if the array size might be negative
     }
     return false;
   }
 
-
-
-
-
-  public record Pair<K, V>(K key, V value) {
+  private record Pair<K, V>(K key, V value) {
 
     @Override
     public String toString() {
@@ -211,3 +191,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     }
   }
 }
+
+
+
+
