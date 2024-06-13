@@ -2,9 +2,6 @@ package de.uni_passau.fim.se2.sa.examples;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PublicFunctionalTest {
@@ -24,8 +21,7 @@ public class PublicFunctionalTest {
     @Test
     public void testIfElse() {
         PublicFunctional pf = new PublicFunctional();
-        assertDoesNotThrow(pf::ifelse);
-
+        assertDoesNotThrow( pf::ifelse);
     }
 
     @Test
@@ -35,7 +31,7 @@ public class PublicFunctionalTest {
     }
 
     @Test
-    public void add() {
+    public void testAdd() {
         PublicFunctional pf = new PublicFunctional();
         assertEquals(3, pf.add());
     }
