@@ -322,6 +322,9 @@ public class SignTransferRelation implements TransferRelation {
           if(pRHS == SignValue.ZERO || pRHS == SignValue.UNINITIALIZED_VALUE){
             return SignValue.BOTTOM;
           }
+          if(pRHS == SignValue.TOP){
+            return SignValue.TOP;
+          }
           return  pLHS;
           // Additional cases can be added here if needed
           // Default case
