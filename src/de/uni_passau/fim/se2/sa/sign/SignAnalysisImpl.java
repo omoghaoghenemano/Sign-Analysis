@@ -22,6 +22,7 @@ import org.objectweb.asm.tree.analysis.Frame;
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
   public String add(List<Pair<AbstractInsnNode, Frame<SignValue>>> elements) {
+    System.out.println("what is in element:"+elements);
     if (elements == null || elements.isEmpty()) {
       return "No warnings or errors found";
     }
