@@ -62,20 +62,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
       }
     }
 
-    // Include analysis for PublicFunctional methods
-    if (pClassName.equals("de/uni_passau/fim/se2/sa/examples/PublicFunctional")) {
-      PublicFunctional pf = new PublicFunctional();
-      if (pMethodName.equals("add")) {
-        int addAnalysisResult = pf.add();
-        // Process addAnalysisResult if needed
-      } else if (pMethodName.equals("div")) {
-        int divAnalysisResult = pf.div();
-
-
-        // Process divAnalysisResult if needed
-      }
-      // Add more checks for other methods in PublicFunctional as required
-    }
+   
 
     return extractAnalysisResults(pairs);
   }
