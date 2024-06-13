@@ -23,13 +23,21 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
 
-  public int add() {
-    int a = 1;
-    int b = 2;
-    int c = a + b;
-    return c;
+  public static String add(List<Pair<String, String>> elements) {
+    if (elements == null || elements.isEmpty()) {
+      return "No warnings or errors found";
+    }
+
+    StringBuilder result = new StringBuilder("No warnings or errors found");
+    for (Pair<String, String> pair : elements) {
+      result.append("\n").append(pair.value());
+    }
+
+    return result.toString();
   }
-  
+
+
+
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
           final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
@@ -40,7 +48,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     MethodNode targetMethod = null;
     for (MethodNode method : classNode.methods) {
       if (method.name.equals("add") && method.desc.equals("()I")) {
-        add();
         targetMethod = method;
         break;
       }
@@ -156,7 +163,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
   }
 
 
-  private record Pair<K, V>(K key, V value) {
+  public record Pair<K, V>(K key, V value) {
 
     @Override
     public String toString() {
