@@ -342,7 +342,7 @@ public class SignTransferRelation implements TransferRelation {
             return  SignValue.PLUS;
           }
           if(pRHS == SignValue.ZERO_MINUS){
-            return  SignValue.BOTTOM;
+            return  SignValue.ZERO_PLUS;
           }
           // Additional cases can be added here if needed
           return SignValue.TOP; // Default case
@@ -414,10 +414,10 @@ public class SignTransferRelation implements TransferRelation {
             return  SignValue.PLUS_MINUS;
           }
           if(pRHS == SignValue.ZERO_PLUS){
-            return  SignValue.BOTTOM;
+            return  SignValue.ZERO_PLUS;
           }
           if(pRHS == SignValue.PLUS){
-            return SignValue.PLUS;
+            return SignValue.ZERO_PLUS;
           }
         }
 
