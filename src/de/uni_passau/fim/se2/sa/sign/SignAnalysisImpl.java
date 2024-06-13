@@ -23,6 +23,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
 
+
   public String add(List<Pair<AbstractInsnNode, Frame<SignValue>>> elements) {
     if (elements == null || elements.isEmpty()) {
       return "No warnings or errors found";
@@ -40,21 +41,24 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
       }
 
       if (isDivByZero(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ERROR: Division by Zero detected\n");
+        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.DIVISION_BY_ZERO.getValue()).append("\n");
       } else if (isMaybeDivByZero(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": WARNING: Division by Zero detected\n");
+        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.MAYBE_DIVISION_BY_ZERO.getValue()).append("\n");
       }
 
       if (isNegativeArrayIndex(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": ERROR: Negative Array Index detected\n");
+        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.NEGATIVE_ARRAY_INDEX.getValue()).append("\n");
       } else if (isMaybeNegativeArrayIndex(instruction, frame)) {
-        result.append("Line ").append(lineNumber).append(": WARNING: Negative Array Index detected\n");
+        result.append("Line ").append(lineNumber).append(": ").append(AnalysisResult.MAYBE_NEGATIVE_ARRAY_INDEX.getValue()).append("\n");
+      }
+
+      if (isAddition(instruction, frame)) {
+        result.append("Line ").append(lineNumber).append(": INFO: Addition operation\n");
       }
     }
 
     return result.toString().trim(); // Remove the trailing newline
   }
-
 
 
 
