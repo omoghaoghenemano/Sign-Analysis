@@ -31,7 +31,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
     MethodNode targetMethod = null;
     for (MethodNode method : classNode.methods) {
-      if (method.name.equals("add") && method.desc.equals("()I")) {
+      if (method.name.equals(pMethodName) && method.desc.equals("()I")) {
         targetMethod = method;
         break;
       }
