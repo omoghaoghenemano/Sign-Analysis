@@ -130,17 +130,21 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
+
   private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction is a division or remainder operation
-    System.out.println("Analyzing instruction: " + pInstruction);
-    System.out.println("Frame state: " + pFrame);
-    if (pInstruction.getOpcode() == IDIV || pInstruction.getOpcode() == IREM) {
-      // Get the value on the stack that would be the divisor
+    // Check if the instruction is a division operation (IDIV)
+    if (pInstruction.getOpcode() == IDIV) {
+      // Get the divisor value from the stack
       SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
-      return divisor == SignValue.ZERO;
+
+      // Check if the divisor is zero
+      if (divisor == SignValue.ZERO) {
+        return true; // Division by zero detected
+      }
     }
-    return false;
+    return false; // No division by zero detected
   }
+
 
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
     return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
