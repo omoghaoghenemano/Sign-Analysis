@@ -72,11 +72,9 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     for (int i = 0; i < targetMethod.instructions.size(); i++) {
       AbstractInsnNode instruction = targetMethod.instructions.get(i);
       Frame<SignValue> frame = frames[i];
-      System.out.println("does it come here");
       if (frame != null) {
-
         pairs.add(new Pair<>(instruction, frame));
-        System.out.println(pairs);
+
       }
     }
 
