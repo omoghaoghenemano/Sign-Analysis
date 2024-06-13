@@ -8,9 +8,11 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class SignAnalysisImplTest {
+
 
 
     @Test
@@ -20,6 +22,8 @@ public class SignAnalysisImplTest {
 
         SignAnalysisImpl analysis = new SignAnalysisImpl();
         SortedSetMultimap<Integer, AnalysisResult> results = analysis.analyse(className, methodName);
+
+        assertEquals( 3, analysis.add() );
 
         // Assert that no division by zero or negative array index issues are found
         assertFalse(results.containsKey(-1), "No issues should be reported for line -1");

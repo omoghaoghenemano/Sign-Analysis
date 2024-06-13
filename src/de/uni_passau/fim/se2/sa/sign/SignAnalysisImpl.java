@@ -139,7 +139,14 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     }
     return false;
   }
-
+  private boolean isAddition(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    // Check if the instruction is an addition operation
+    if (pInstruction.getOpcode() == IADD || pInstruction.getOpcode() == FADD
+            || pInstruction.getOpcode() == DADD || pInstruction.getOpcode() == LADD) {
+      return true;
+    }
+    return false;
+  }
 
 
   private record Pair<K, V>(K key, V value) {
