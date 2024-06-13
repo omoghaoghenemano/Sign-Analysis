@@ -377,7 +377,7 @@ public class SignTransferRelation implements TransferRelation {
         // Handle ZERO_MINUS cases
         if (pLHS == SignValue.ZERO_MINUS) {
           if (pRHS == SignValue.PLUS ) {
-            return SignValue.ZERO_PLUS; // Assuming ZERO_MINUS as the priority
+            return SignValue.ZERO_MINUS; // Assuming ZERO_MINUS as the priority
           }
           if( pRHS == SignValue.ZERO_PLUS){
             return SignValue.ZERO_MINUS;
