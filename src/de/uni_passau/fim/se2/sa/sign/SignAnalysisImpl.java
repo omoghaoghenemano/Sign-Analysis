@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LineNumberNode;
@@ -136,59 +135,57 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
   private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == Opcodes.IDIV ) {
-      int stackSize = frame.getStackSize();
-      if (stackSize >= 2) { // Ensure there are enough operands on the stack
+    if (instruction.getOpcode() == IDIV) {
+      SignValue divisor = frame.getStack(frame.getStackSize() - 1);
+      return divisor == SignValue.ZERO;
+    }
+    return false;
+  }
 
-        SignValue denominator = frame.getStack(stackSize - 2);
 
-        // Check if the denominator (second top of stack) is zero
-        if (denominator == SignValue.ZERO) {
-          return true; // Division by zero detected
-        }
+  private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == IDIV) {
+      if (frame.getStackSize() > 0) {
+        SignValue divisor = frame.getStack(frame.getStackSize() - 1);
+        return divisor == SignValue.ZERO ||
+                divisor == SignValue.ZERO_MINUS ||
+                divisor == SignValue.ZERO_PLUS;
       }
     }
-    return false; // No division by zero detected
-  }
+    return false;
+  } 
 
-  private boolean isMaybeDivByZero(
-          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction might cause a division by zero
-    if (pInstruction.getOpcode() == Opcodes.IDIV ) {
-      // For integer, long, float, or double division
-      SignValue divisor = getDivisorValue(pInstruction, pFrame);
-      return SignValue.isMaybeZero(divisor); // Check if the divisor might be zero
+
+  private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == IALOAD) {
+      if (frame.getStackSize() > 0) {
+        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
+        return indexValue == SignValue.MINUS ||
+                indexValue == SignValue.ZERO_MINUS ||
+                indexValue == SignValue.PLUS_MINUS;
+      }
     }
     return false;
   }
 
-  private SignValue getDivisorValue(AbstractInsnNode pInstruction, Frame<SignValue> pFrame) {
-    int stackSize = pFrame.getStackSize();
-    // For most divisions, the divisor is the second item on the stack
-    return pFrame.getStack(stackSize - 2);
-  }
-
-  private boolean isNegativeArrayIndex(
-          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction causes a negative array index
-    if (pInstruction.getOpcode() == Opcodes.ARRAYLENGTH) {
-      SignValue arraySize = pFrame.getStack(pFrame.getStackSize() - 1); // Array size on the stack
-      return SignValue.isNegative(arraySize); // Check if the array size is negative
+  /** {@inheritDoc} */
+  private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == IALOAD) {
+      if (frame.getStackSize() > 0) {
+        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
+        return indexValue == SignValue.MINUS ||
+                indexValue == SignValue.ZERO_MINUS ||
+                indexValue == SignValue.PLUS_MINUS ||
+                indexValue == SignValue.TOP;
+      }
     }
     return false;
   }
 
-  private boolean isMaybeNegativeArrayIndex(
-          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction might cause a negative array index
-    if (pInstruction.getOpcode() == Opcodes.ARRAYLENGTH) {
-      SignValue arraySize = pFrame.getStack(pFrame.getStackSize() - 1); // Array size on the stack
-      return SignValue.isMaybeNegative(arraySize); // Check if the array size might be negative
-    }
-    return false;
-  }
 
-  private record Pair<K, V>(K key, V value) {
+
+
+  public record Pair<K, V>(K key, V value) {
 
     @Override
     public String toString() {
@@ -196,7 +193,3 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     }
   }
 }
-
-
-
-
