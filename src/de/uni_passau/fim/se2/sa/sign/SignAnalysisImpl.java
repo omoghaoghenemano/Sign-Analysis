@@ -23,19 +23,39 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
 
-
-    public static String add(List<Pair<String, String>> elements) {
-      if (elements == null || elements.isEmpty()) {
-        return "No warnings or errors found";
-      }
-
-      StringBuilder result = new StringBuilder();
-      for (Pair<String, String> pair : elements) {
-        result.append(pair.key()).append(": ").append(pair.value()).append("\n");
-      }
-
-      return result.toString().trim(); // Remove the trailing newline
+  public String add(List<Pair<AbstractInsnNode, Frame<SignValue>>> elements) {
+    if (elements == null || elements.isEmpty()) {
+      return "No warnings or errors found";
     }
+
+    StringBuilder result = new StringBuilder();
+    int lineNumber = -1;
+
+    for (Pair<AbstractInsnNode, Frame<SignValue>> pair : elements) {
+      AbstractInsnNode instruction = pair.key();
+      Frame<SignValue> frame = pair.value();
+
+      if (instruction instanceof LineNumberNode) {
+        lineNumber = ((LineNumberNode) instruction).line;
+      }
+
+      if (isDivByZero(instruction, frame)) {
+        result.append("Line ").append(lineNumber).append(": ERROR: Division by Zero detected\n");
+      } else if (isMaybeDivByZero(instruction, frame)) {
+        result.append("Line ").append(lineNumber).append(": WARNING: Division by Zero detected\n");
+      }
+
+      if (isNegativeArrayIndex(instruction, frame)) {
+        result.append("Line ").append(lineNumber).append(": ERROR: Negative Array Index detected\n");
+      } else if (isMaybeNegativeArrayIndex(instruction, frame)) {
+        result.append("Line ").append(lineNumber).append(": WARNING: Negative Array Index detected\n");
+      }
+    }
+
+    return result.toString().trim(); // Remove the trailing newline
+  }
+
+
 
 
 
