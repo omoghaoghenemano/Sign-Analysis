@@ -37,10 +37,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
         targetMethod = method;
         break;
       }
-      if (method.name.equals("div") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
+
       if (method.name.equals("allCases") && method.desc.equals("()I")) {
         targetMethod = method;
         break;
@@ -49,14 +46,15 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
         targetMethod = method;
         break;
       }
+      if (method.name.equals("div") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
       if (method.name.equals("first") && method.desc.equals("()I")) {
         targetMethod = method;
         break;
       }
-      if (method.name.equals("second") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
+
       if (method.name.equals("foo") && method.desc.equals("()I")) {
         targetMethod = method;
         break;
