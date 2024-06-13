@@ -56,6 +56,10 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
         result.append("Line ").append(lineNumber).append(": INFO: Addition operation\n");
       }
     }
+    if (result.length() == 0) {
+      return "No warnings or errors found";
+    }
+
 
     return result.toString().trim(); // Remove the trailing newline
   }
@@ -136,47 +140,37 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
-  private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction is a division or remainder operation
-    if (pInstruction.getOpcode() == IDIV ){
-      // Get the value on the stack that would be the divisor
-      SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
-      return divisor == SignValue.ZERO;
-    }
-    return false;
+  private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
+            frame.getStackSize() > 0 &&
+            frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO;
   }
 
-  private boolean isMaybeDivByZero(
-          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction is a division or remainder operation
-    if (pInstruction.getOpcode() == IDIV ){
-      SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
-      return divisor == SignValue.ZERO || divisor == SignValue.ZERO_MINUS || divisor == SignValue.ZERO_PLUS;
-    }
-    return false;
+  private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
+            frame.getStackSize() > 0 &&
+            (frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_PLUS);
   }
 
-  private boolean isNegativeArrayIndex(
-          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction is an array load or store operation
-    if (pInstruction.getOpcode() == IALOAD ){
-      // Get the index on the stack
-      SignValue index = pFrame.getStack(pFrame.getStackSize() - 1);
-      return index == SignValue.MINUS || index == SignValue.ZERO_MINUS || index == SignValue.PLUS_MINUS;
-    }
-    return false;
+  private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
+            frame.getStackSize() > 0 &&
+            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS);
   }
 
-  private boolean isMaybeNegativeArrayIndex(
-          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction is an array load or store operation
-    if (pInstruction.getOpcode() == IALOAD ){
-      // Get the index on the stack
-      SignValue index = pFrame.getStack(pFrame.getStackSize() - 1);
-      return index == SignValue.MINUS || index == SignValue.ZERO_MINUS || index == SignValue.PLUS_MINUS || index == SignValue.TOP;
-    }
-    return false;
+  private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
+            frame.getStackSize() > 0 &&
+            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.TOP);
   }
+
   private boolean isAddition(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
     // Check if the instruction is an addition operation
     if (pInstruction.getOpcode() == IADD || pInstruction.getOpcode() == FADD
