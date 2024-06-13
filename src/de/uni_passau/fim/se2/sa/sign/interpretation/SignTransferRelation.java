@@ -319,6 +319,9 @@ public class SignTransferRelation implements TransferRelation {
 
         // Handle ZERO cases
         if (pLHS == SignValue.ZERO) {
+          if(pRHS == SignValue.ZERO || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.ZERO_MINUS || pRHS == SignValue.UNINITIALIZED_VALUE){
+            return SignValue.BOTTOM;
+          }
           return  pLHS;
           // Additional cases can be added here if needed
           // Default case
