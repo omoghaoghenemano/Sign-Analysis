@@ -134,54 +134,54 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
   }
 
 
-  private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction is a division operation (IDIV)
-    if (pInstruction.getOpcode() == IDIV) {
-      // Get the divisor value from the stack
-      SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
-
-      // Check if the divisor is zero
-      if (divisor == SignValue.ZERO) {
-        return true; // Division by zero detected
-      }
+  private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == IDIV) {
+      SignValue divisor = frame.getStack(frame.getStackSize() - 1);
+      return divisor == SignValue.ZERO;
     }
-    return false; // No division by zero detected
+    return false;
   }
 
 
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
-            frame.getStackSize() > 0 &&
-            (frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_PLUS);
-  }
-
-  private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
-            frame.getStackSize() > 0 &&
-            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS);
-  }
-
-  private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
-            frame.getStackSize() > 0 &&
-            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.TOP);
-  }
-
-  private boolean isAddition(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
-    // Check if the instruction is an addition operation
-    if (pInstruction.getOpcode() == IADD || pInstruction.getOpcode() == FADD
-            || pInstruction.getOpcode() == DADD || pInstruction.getOpcode() == LADD) {
-      return true;
+    if (instruction.getOpcode() == IDIV) {
+      if (frame.getStackSize() > 0) {
+        SignValue divisor = frame.getStack(frame.getStackSize() - 1);
+        return divisor == SignValue.ZERO ||
+                divisor == SignValue.ZERO_MINUS ||
+                divisor == SignValue.ZERO_PLUS;
+      }
     }
     return false;
   }
+
+
+  private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == IALOAD) {
+      if (frame.getStackSize() > 0) {
+        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
+        return indexValue == SignValue.MINUS ||
+                indexValue == SignValue.ZERO_MINUS ||
+                indexValue == SignValue.PLUS_MINUS;
+      }
+    }
+    return false;
+  }
+
+  private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == IALOAD) {
+      if (frame.getStackSize() > 0) {
+        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
+        return indexValue == SignValue.MINUS ||
+                indexValue == SignValue.ZERO_MINUS ||
+                indexValue == SignValue.PLUS_MINUS ||
+                indexValue == SignValue.TOP;
+      }
+    }
+    return false;
+  }
+
+
 
 
   public record Pair<K, V>(K key, V value) {
