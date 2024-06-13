@@ -354,20 +354,21 @@ public class SignTransferRelation implements TransferRelation {
 
         // Handle ZERO_PLUS cases
         if (pLHS == SignValue.ZERO_PLUS) {
-          if (pRHS == SignValue.MINUS ) {
-            return SignValue.ZERO;
+          if (pRHS == SignValue.PLUS ) {
+            return SignValue.ZERO_PLUS; // Assuming ZERO_MINUS as the priority
           }
-          if( pRHS == SignValue.ZERO_MINUS ){
-            return SignValue.ZERO;
+          if( pRHS == SignValue.ZERO_PLUS){
+            return SignValue.ZERO_PLUS;
           }
+          if(pRHS == SignValue.MINUS){
+            return SignValue.ZERO_MINUS;
+          }
+
           if( pRHS == SignValue.ZERO){
-            return SignValue.ZERO;
-          }
-          if(pRHS == SignValue.PLUS){
             return  SignValue.ZERO;
           }
-          if(pRHS == SignValue.ZERO_PLUS){
-            return  SignValue.ZERO;
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO_MINUS;
           }
           // Additional cases can be added here if needed
           return SignValue.TOP; // Default case
@@ -375,18 +376,21 @@ public class SignTransferRelation implements TransferRelation {
 
         // Handle ZERO_MINUS cases
         if (pLHS == SignValue.ZERO_MINUS) {
-          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS ) {
-            return SignValue.ZERO; // Assuming ZERO_MINUS as the priority
+          if (pRHS == SignValue.PLUS ) {
+            return SignValue.ZERO_PLUS; // Assuming ZERO_MINUS as the priority
+          }
+          if( pRHS == SignValue.ZERO_PLUS){
+            return SignValue.ZERO_MINUS;
           }
           if(pRHS == SignValue.MINUS){
-            return  SignValue.ZERO;
+            return SignValue.ZERO_PLUS;
           }
 
           if( pRHS == SignValue.ZERO){
             return  SignValue.ZERO;
           }
           if(pRHS == SignValue.ZERO_MINUS){
-            return  SignValue.ZERO;
+            return  SignValue.ZERO_PLUS;
           }
           // Additional cases can be added here if needed
           return SignValue.TOP; // Default case
