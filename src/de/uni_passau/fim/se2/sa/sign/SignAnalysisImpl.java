@@ -19,9 +19,12 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
 
-public class SignAnalysisImpl extends PublicFunctional implements SignAnalysis, Opcodes {
+public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
+ 
+
+  
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
           final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
@@ -41,11 +44,11 @@ public class SignAnalysisImpl extends PublicFunctional implements SignAnalysis, 
     if (targetMethod == null) {
       throw new IllegalArgumentException("Method not found: " + pMethodName);
     }
-    System.out.println("does it come here");
+
     SignInterpreter interpreter = new SignInterpreter();
     Analyzer<SignValue> analyzer = new Analyzer<>(interpreter);
     Frame<SignValue>[] frames = analyzer.analyze(pClassName, targetMethod);
-    System.out.println("does it come here");
+
     List<Pair<AbstractInsnNode, Frame<SignValue>>> pairs = new ArrayList<>();
     for (int i = 0; i < targetMethod.instructions.size(); i++) {
       AbstractInsnNode instruction = targetMethod.instructions.get(i);
@@ -131,6 +134,8 @@ public class SignAnalysisImpl extends PublicFunctional implements SignAnalysis, 
     }
     return false;
   }
+
+
 
   private record Pair<K, V>(K key, V value) {
 

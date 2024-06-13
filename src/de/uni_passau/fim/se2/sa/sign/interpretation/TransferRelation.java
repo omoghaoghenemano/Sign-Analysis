@@ -54,4 +54,5 @@ public interface TransferRelation {
    * @return The result of the operation application
    */
   SignValue evaluate(final Operation pOperation, final SignValue pLHS, final SignValue pRHS);
+
 }
