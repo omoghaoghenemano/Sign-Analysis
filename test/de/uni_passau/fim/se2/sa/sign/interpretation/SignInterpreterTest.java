@@ -26,53 +26,37 @@ public class SignInterpreterTest {
         SignInterpreter interpreter = new SignInterpreter();
 
         AbstractInsnNode instr = new InsnNode(Opcodes.ICONST_0);
-        try {
+
             assertEquals(SignValue.ZERO, interpreter.newOperation(instr));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
 
         instr = new InsnNode(Opcodes.ICONST_1);
-        try {
+
             assertEquals(SignValue.PLUS, interpreter.newOperation(instr));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
+
 
         instr = new InsnNode(Opcodes.ICONST_M1);
-        try {
+
             assertEquals(SignValue.MINUS, interpreter.newOperation(instr));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
+
 
         instr = new InsnNode(Opcodes.BIPUSH);
-        try {
+
             assertEquals(SignValue.TOP, interpreter.newOperation(instr));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
+
 
         instr = new InsnNode(Opcodes.SIPUSH);
-        try {
+
             assertEquals(SignValue.TOP, interpreter.newOperation(instr));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
+
 
         LdcInsnNode ldcInsnNode = new LdcInsnNode(0);
-        try {
+
             assertEquals(SignValue.ZERO, interpreter.newOperation(ldcInsnNode));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
 
         ldcInsnNode = new LdcInsnNode(1);
-        try {
+
             assertEquals(SignValue.PLUS, interpreter.newOperation(ldcInsnNode));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
+
 
     }
 
@@ -89,20 +73,17 @@ public class SignInterpreterTest {
         SignInterpreter interpreter = new SignInterpreter();
 
         AbstractInsnNode instr = new InsnNode(Opcodes.INEG);
-        try {
+
+
             assertEquals(SignValue.MINUS, interpreter.unaryOperation(instr, SignValue.PLUS));
             assertEquals(SignValue.PLUS, interpreter.unaryOperation(instr, SignValue.MINUS));
             assertEquals(SignValue.ZERO, interpreter.unaryOperation(instr, SignValue.ZERO));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
+
 
         instr = new InsnNode(Opcodes.IINC);
-        try {
+
             assertEquals(SignValue.TOP, interpreter.unaryOperation(instr, SignValue.PLUS));
-        } catch (AnalyzerException e) {
-            fail("AnalyzerException should not be thrown");
-        }
+
 
 
     }

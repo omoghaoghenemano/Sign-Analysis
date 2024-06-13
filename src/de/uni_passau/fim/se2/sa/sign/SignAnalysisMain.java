@@ -25,13 +25,13 @@ public class SignAnalysisMain implements Callable<Integer> {
   public Integer call() throws Exception {
     final SignAnalysis analysis = new SignAnalysisImpl();
     final SortedSetMultimap<Integer, AnalysisResult> results =
-        analysis.analyse(className, methodName);
+            analysis.analyse(className, methodName);
     printAnalysisResults(results);
     return 0;
   }
 
   private void printAnalysisResults(
-      final SortedSetMultimap<Integer, AnalysisResult> pAnalysisResults) {
+          final SortedSetMultimap<Integer, AnalysisResult> pAnalysisResults) {
     if (pAnalysisResults.isEmpty()) {
       System.out.println("No warnings or errors found");
       return;
@@ -47,9 +47,9 @@ public class SignAnalysisMain implements Callable<Integer> {
 
   // @formatter:off
   @Option(
-      names = {"-c", "--class"},
-      description = "The class to analyze.",
-      required = true)
+          names = {"-c", "--class"},
+          description = "The class to analyze.",
+          required = true)
   // @formatter:on
   public void setClassName(String pClassName) {
     className = pClassName;
@@ -57,9 +57,9 @@ public class SignAnalysisMain implements Callable<Integer> {
 
   // @formatter:off
   @Option(
-      names = {"-m", "--method"},
-      description = "The name of the method to start the analysis with.",
-      required = true)
+          names = {"-m", "--method"},
+          description = "The name of the method to start the analysis with.",
+          required = true)
   // @formatter:on
   public void setMethodName(String pMethodName) {
     methodName = pMethodName;

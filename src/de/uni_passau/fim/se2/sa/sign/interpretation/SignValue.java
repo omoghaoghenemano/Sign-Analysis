@@ -17,6 +17,7 @@ public enum SignValue implements Value {
   TOP("⊤"), // 7 == MINUS | ZERO | PLUS
   UNINITIALIZED_VALUE("∅"); // 8
 
+
   private final String repr;
 
   SignValue(final String pRepr) {

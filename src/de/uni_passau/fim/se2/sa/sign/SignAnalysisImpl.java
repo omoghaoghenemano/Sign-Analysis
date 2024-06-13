@@ -15,41 +15,49 @@ import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
+import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
 
 public class SignAnalysisImpl implements SignAnalysis, Opcodes {
 
+
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
           final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
-    // Read the class
     ClassReader classReader = new ClassReader(pClassName);
     ClassNode classNode = new ClassNode();
     classReader.accept(classNode, 0);
 
-    // Find the method
-    MethodNode methodNode = null;
-    for (MethodNode mn : classNode.methods) {
-      if (mn.name.equals(pMethodName)) {
-        methodNode = mn;
+    MethodNode targetMethod = null;
+    for (MethodNode method : classNode.methods) {
+      if (method.name.equals(pMethodName)) {
+        targetMethod = method;
         break;
       }
     }
-    if (methodNode == null) {
+
+    if (targetMethod == null) {
       throw new IllegalArgumentException("Method not found: " + pMethodName);
     }
-
-    // Perform the analysis
+    System.out.println("does it come here");
     SignInterpreter interpreter = new SignInterpreter();
     Analyzer<SignValue> analyzer = new Analyzer<>(interpreter);
-    Frame<SignValue>[] frames = analyzer.analyze(pClassName, methodNode);
-
-    // Collect the analysis results
+    Frame<SignValue>[] frames = analyzer.analyze(pClassName, targetMethod);
+    System.out.println("does it come here");
     List<Pair<AbstractInsnNode, Frame<SignValue>>> pairs = new ArrayList<>();
-    for (int i = 0; i < methodNode.instructions.size(); i++) {
-      pairs.add(new Pair<>(methodNode.instructions.get(i), frames[i]));
+    for (int i = 0; i < targetMethod.instructions.size(); i++) {
+      AbstractInsnNode instruction = targetMethod.instructions.get(i);
+      Frame<SignValue> frame = frames[i];
+      System.out.println("does it come here");
+      if (frame != null) {
+
+        pairs.add(new Pair<>(instruction, frame));
+        System.out.println(pairs);
+      }
     }
+
     return extractAnalysisResults(pairs);
+
   }
 
   private SortedSetMultimap<Integer, AnalysisResult> extractAnalysisResults(
@@ -82,10 +90,7 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
 
   private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
     // Check if the instruction is a division or remainder operation
-    if (pInstruction.getOpcode() == IDIV || pInstruction.getOpcode() == LDIV ||
-            pInstruction.getOpcode() == FDIV || pInstruction.getOpcode() == DDIV ||
-            pInstruction.getOpcode() == IREM || pInstruction.getOpcode() == LREM ||
-            pInstruction.getOpcode() == FREM || pInstruction.getOpcode() == DREM) {
+    if (pInstruction.getOpcode() == IDIV ){
       // Get the value on the stack that would be the divisor
       SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
       return divisor == SignValue.ZERO;
@@ -96,11 +101,7 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
   private boolean isMaybeDivByZero(
           final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
     // Check if the instruction is a division or remainder operation
-    if (pInstruction.getOpcode() == IDIV || pInstruction.getOpcode() == LDIV ||
-            pInstruction.getOpcode() == FDIV || pInstruction.getOpcode() == DDIV ||
-            pInstruction.getOpcode() == IREM || pInstruction.getOpcode() == LREM ||
-            pInstruction.getOpcode() == FREM || pInstruction.getOpcode() == DREM) {
-      // Get the value on the stack that would be the divisor
+    if (pInstruction.getOpcode() == IDIV ){
       SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
       return divisor == SignValue.ZERO || divisor == SignValue.ZERO_MINUS || divisor == SignValue.ZERO_PLUS;
     }
@@ -110,14 +111,7 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
   private boolean isNegativeArrayIndex(
           final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
     // Check if the instruction is an array load or store operation
-    if (pInstruction.getOpcode() == IALOAD || pInstruction.getOpcode() == LALOAD ||
-            pInstruction.getOpcode() == FALOAD || pInstruction.getOpcode() == DALOAD ||
-            pInstruction.getOpcode() == AALOAD || pInstruction.getOpcode() == BALOAD ||
-            pInstruction.getOpcode() == CALOAD || pInstruction.getOpcode() == SALOAD ||
-            pInstruction.getOpcode() == IASTORE || pInstruction.getOpcode() == LASTORE ||
-            pInstruction.getOpcode() == FASTORE || pInstruction.getOpcode() == DASTORE ||
-            pInstruction.getOpcode() == AASTORE || pInstruction.getOpcode() == BASTORE ||
-            pInstruction.getOpcode() == CASTORE || pInstruction.getOpcode() == SASTORE) {
+    if (pInstruction.getOpcode() == IALOAD ){
       // Get the index on the stack
       SignValue index = pFrame.getStack(pFrame.getStackSize() - 1);
       return index == SignValue.MINUS || index == SignValue.ZERO_MINUS || index == SignValue.PLUS_MINUS;
@@ -128,14 +122,7 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
   private boolean isMaybeNegativeArrayIndex(
           final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
     // Check if the instruction is an array load or store operation
-    if (pInstruction.getOpcode() == IALOAD || pInstruction.getOpcode() == LALOAD ||
-            pInstruction.getOpcode() == FALOAD || pInstruction.getOpcode() == DALOAD ||
-            pInstruction.getOpcode() == AALOAD || pInstruction.getOpcode() == BALOAD ||
-            pInstruction.getOpcode() == CALOAD || pInstruction.getOpcode() == SALOAD ||
-            pInstruction.getOpcode() == IASTORE || pInstruction.getOpcode() == LASTORE ||
-            pInstruction.getOpcode() == FASTORE || pInstruction.getOpcode() == DASTORE ||
-            pInstruction.getOpcode() == AASTORE || pInstruction.getOpcode() == BASTORE ||
-            pInstruction.getOpcode() == CASTORE || pInstruction.getOpcode() == SASTORE) {
+    if (pInstruction.getOpcode() == IALOAD ){
       // Get the index on the stack
       SignValue index = pFrame.getStack(pFrame.getStackSize() - 1);
       return index == SignValue.MINUS || index == SignValue.ZERO_MINUS || index == SignValue.PLUS_MINUS || index == SignValue.TOP;

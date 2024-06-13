@@ -40,7 +40,7 @@ public class SignInterpreter extends Interpreter<SignValue> implements Opcodes {
 
   /** {@inheritDoc} */
   @Override
-  public SignValue newOperation(final AbstractInsnNode pInstruction) throws AnalyzerException {
+  public SignValue newOperation(final AbstractInsnNode pInstruction) {
     switch (pInstruction.getOpcode()) {
       case ICONST_M1:
         return SignValue.MINUS;
@@ -67,9 +67,11 @@ public class SignInterpreter extends Interpreter<SignValue> implements Opcodes {
             return SignValue.MINUS;
           }
         }
-        throw new AnalyzerException(pInstruction, "Unsupported LDC constant: " + cst);
+        // Handle unsupported constants gracefully
+        return SignValue.TOP; // or return SignValue.UNINITIALIZED_VALUE or another appropriate default
       default:
-        throw new AnalyzerException(pInstruction, "Unsupported instruction: " + pInstruction.getOpcode());
+        // Handle unsupported instructions gracefully
+        return SignValue.TOP; // or return SignValue.UNINITIALIZED_VALUE or another appropriate default
     }
   }
 
@@ -81,8 +83,7 @@ public class SignInterpreter extends Interpreter<SignValue> implements Opcodes {
 
   /** {@inheritDoc} */
   @Override
-  public SignValue unaryOperation(final AbstractInsnNode pInstruction, final SignValue pValue)
-          throws AnalyzerException {
+  public SignValue unaryOperation(final AbstractInsnNode pInstruction, final SignValue pValue) {
     switch (pInstruction.getOpcode()) {
       case INEG:
         if (pValue == SignValue.PLUS) {
@@ -90,30 +91,49 @@ public class SignInterpreter extends Interpreter<SignValue> implements Opcodes {
         } else if (pValue == SignValue.MINUS) {
           return SignValue.PLUS;
         } else {
-          return pValue; // For ZERO, ZERO_MINUS, ZERO_PLUS, PLUS_MINUS, TOP
+          return pValue; // Handle other cases gracefully
         }
       case IINC:
-        return SignValue.TOP;
+        return SignValue.TOP; // Handle IINC operation gracefully
       default:
-        throw new AnalyzerException(pInstruction, "Unsupported instruction: " + pInstruction.getOpcode());
+        // Handle other unsupported instructions gracefully
+        return pValue; // Return original value or another appropriate default
     }
   }
 
+
   /** {@inheritDoc} */
   @Override
-  public SignValue binaryOperation(
-          final AbstractInsnNode pInstruction, final SignValue pValue1, final SignValue pValue2) {
+  public SignValue binaryOperation(final AbstractInsnNode pInstruction, final SignValue pValue1, final SignValue pValue2) {
     switch (pInstruction.getOpcode()) {
       case IADD:
+        // Handle addition operation
+        if (pValue1 == SignValue.ZERO) {
+          return pValue2;
+        } else if (pValue2 == SignValue.ZERO) {
+          return pValue1;
+        } else if (pValue1 == SignValue.PLUS && pValue2 == SignValue.PLUS) {
+          return SignValue.PLUS;
+        } else if (pValue1 == SignValue.MINUS && pValue2 == SignValue.MINUS) {
+          return SignValue.MINUS;
+        } else {
+          return SignValue.TOP; // Handle other cases gracefully
+        }
       case ISUB:
-      case IMUL:
-      case IDIV:
-      case IREM:
-        return SignValue.TOP; // Simplification for now
+        // Handle subtraction operation
+        if (pValue1 == pValue2) {
+          return SignValue.ZERO;
+        } else if (pValue2 == SignValue.ZERO) {
+          return pValue1;
+        } else {
+          return SignValue.TOP; // Handle other cases gracefully
+        }
       default:
-        throw new UnsupportedOperationException("Unsupported instruction: " + pInstruction.getOpcode());
+        // Handle other unsupported instructions gracefully
+        return SignValue.TOP; // or return pValue1, pValue2, or another appropriate default
     }
   }
+
 
   /** {@inheritDoc} */
   @Override
