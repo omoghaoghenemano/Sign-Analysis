@@ -333,7 +333,7 @@ public class SignTransferRelation implements TransferRelation {
             return SignValue.BOTTOM;
           }
           if(pRHS == SignValue.MINUS){
-            return  SignValue.PLUS;
+            return  SignValue.ZERO_PLUS;
           }
           if(pRHS == SignValue.ZERO){
             return  SignValue.BOTTOM;
