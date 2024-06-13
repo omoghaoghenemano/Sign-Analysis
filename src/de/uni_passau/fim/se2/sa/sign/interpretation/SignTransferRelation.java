@@ -297,31 +297,128 @@ public class SignTransferRelation implements TransferRelation {
           return SignValue.BOTTOM;
         }
 
+        // Handle uninitialized and zero cases
 
 
-        // Handle division by zero
-        if (pRHS == SignValue.UNINITIALIZED_VALUE || pRHS == SignValue.TOP || pRHS == SignValue.ZERO) {
-          return SignValue.TOP; // Division by zero or uninitialized value
+        // Handle PLUS_MINUS cases
+        if (pLHS == SignValue.PLUS_MINUS) {
+          if (pRHS == SignValue.ZERO) {
+            return SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.PLUS_MINUS || pRHS == SignValue.MINUS ){
+            return  SignValue.PLUS;
+          }
+          if( pRHS == SignValue.PLUS){
+            return  SignValue.MINUS;
+          }
+
+
+
+          // Additional cases can be added here if needed
         }
 
-        // Handle division by constants
-        if (pRHS == SignValue.PLUS || pRHS == SignValue.MINUS || pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.ZERO_MINUS) {
-          return SignValue.PLUS_MINUS; // Division by constant can lead to positive or negative results
+        // Handle ZERO cases
+        if (pLHS == SignValue.ZERO) {
+          return  pLHS;
+          // Additional cases can be added here if needed
+          // Default case
         }
 
-        // Handle division by PLUS_MINUS
-        if (pRHS == SignValue.PLUS_MINUS) {
-          return SignValue.PLUS_MINUS; // Division by PLUS_MINUS can lead to positive or negative results
+        // Handle MINUS cases
+        if (pLHS == SignValue.MINUS) {
+          if (pRHS == SignValue.PLUS ) {
+            return SignValue.MINUS; // Assuming MINUS as the priority
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.MINUS){
+            return  SignValue.PLUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
+            return  SignValue.PLUS;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.BOTTOM;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
         }
 
-        // Handle division by ZERO_PLUS
-        if (pRHS == SignValue.ZERO_PLUS) {
-          return SignValue.ZERO_PLUS; // Division by ZERO_PLUS will result in positive values only
+        // Handle ZERO_PLUS cases
+        if (pLHS == SignValue.ZERO_PLUS) {
+          if (pRHS == SignValue.MINUS ) {
+            return SignValue.ZERO;
+          }
+          if( pRHS == SignValue.ZERO_MINUS ){
+            return SignValue.ZERO;
+          }
+          if( pRHS == SignValue.ZERO){
+            return SignValue.ZERO;
+          }
+          if(pRHS == SignValue.PLUS){
+            return  SignValue.ZERO;
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return  SignValue.ZERO;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
         }
 
-        // Handle division by ZERO_MINUS
-        if (pRHS == SignValue.ZERO_MINUS) {
-          return SignValue.ZERO_MINUS; // Division by ZERO_MINUS will result in negative values only
+        // Handle ZERO_MINUS cases
+        if (pLHS == SignValue.ZERO_MINUS) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS ) {
+            return SignValue.ZERO; // Assuming ZERO_MINUS as the priority
+          }
+          if(pRHS == SignValue.MINUS){
+            return  SignValue.ZERO;
+          }
+
+          if( pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        if(pLHS == SignValue.TOP) {// Handle PLUS cases
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+        }
+
+        if(pLHS == SignValue.UNINITIALIZED_VALUE) {// Handle PLUS cases
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+        }
+
+        if (pLHS == SignValue.PLUS) {
+          if (pRHS == SignValue.ZERO_MINUS ) {
+            return SignValue.BOTTOM; // Assuming PLUS as the priority
+          }
+          if( pRHS == SignValue.MINUS){
+            return SignValue.MINUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
+            return  SignValue.PLUS_MINUS;
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return  SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.PLUS){
+            return SignValue.PLUS;
+          }
         }
 
         // Default case
