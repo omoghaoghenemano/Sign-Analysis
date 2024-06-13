@@ -191,7 +191,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
       if (frame.getStackSize() > 0) {
         SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
         return indexValue == SignValue.MINUS ||
-                indexValue == SignValue.ZERO_MINUS ||
+
                 indexValue == SignValue.PLUS_MINUS;
       }
     }
