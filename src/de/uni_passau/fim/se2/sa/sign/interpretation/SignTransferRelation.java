@@ -16,11 +16,8 @@ public class SignTransferRelation implements TransferRelation {
   }
 
 
-  public SignValue add(  final Operation pOperation, final SignValue pLHS, final SignValue pRHS) {
-    Preconditions.checkState(
-            pOperation == Operation.ADD);
-    Preconditions.checkNotNull(pLHS);
-    Preconditions.checkNotNull(pRHS);
+  public SignValue add(   final SignValue pLHS, final SignValue pRHS) {
+
 
     if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
       return  SignValue.BOTTOM;
@@ -41,9 +38,6 @@ public class SignTransferRelation implements TransferRelation {
             || pLHS ==  SignValue.MINUS && pRHS == SignValue.UNINITIALIZED_VALUE || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.PLUS || pLHS == SignValue.ZERO_PLUS && pRHS == SignValue.PLUS_MINUS || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.PLUS_MINUS  || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.ZERO_PLUS || pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.PLUS  ) return SignValue.TOP;
 
     return  SignValue.TOP;
-
-
-
 
 
   }

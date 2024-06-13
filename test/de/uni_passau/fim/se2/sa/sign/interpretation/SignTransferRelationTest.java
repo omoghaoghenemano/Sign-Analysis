@@ -15,6 +15,21 @@ public class SignTransferRelationTest {
     }
 
     @Test
+    public void testAdd() {
+        SignTransferRelation transferRelation = new SignTransferRelation();
+        assertEquals(SignValue.TOP, transferRelation.add( SignValue.PLUS, SignValue.MINUS));
+        assertEquals(SignValue.ZERO_PLUS, transferRelation.add( SignValue.ZERO_PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.TOP, transferRelation.add( SignValue.ZERO_PLUS, SignValue.ZERO_MINUS));
+        assertEquals(SignValue.TOP, transferRelation.add( SignValue.PLUS_MINUS, SignValue.PLUS));
+        assertEquals(SignValue.BOTTOM, transferRelation.add( SignValue.BOTTOM, SignValue.PLUS));
+        assertEquals(SignValue.BOTTOM, transferRelation.add( SignValue.BOTTOM, SignValue.PLUS));
+        assertEquals(SignValue.MINUS, transferRelation.add( SignValue.MINUS, SignValue.ZERO_MINUS));
+
+    }
+
+
+
+    @Test
     public void testEvaluateUnaryOperation() {
         SignTransferRelation transferRelation = new SignTransferRelation();
 
