@@ -35,7 +35,7 @@ public class PublicFunctionalTest {
     }
 
     @Test
-    public void testAdd() {
+    public void add() {
         PublicFunctional pf = new PublicFunctional();
         assertEquals(3, pf.add());
     }
