@@ -393,7 +393,7 @@ public class SignTransferRelation implements TransferRelation {
 
         if(pLHS == SignValue.TOP) {// Handle PLUS cases
           if(pRHS == SignValue.ZERO){
-            return  SignValue.ZERO;
+            return  SignValue.BOTTOM;
           }
         }
 
