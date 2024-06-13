@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LineNumberNode;
@@ -133,33 +134,30 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
-  private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IDIV) {
-      int stackSize = frame.getStackSize();
-      if (stackSize >= 2) { // Ensure there are enough operands on the stack
-        SignValue divisor = frame.getStack(stackSize - 1);
-        SignValue denominator = frame.getStack(stackSize - 2);
+  private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    int opcode = pInstruction.getOpcode();
+    if (opcode == Opcodes.IDIV || opcode == Opcodes.LDIV ||
+            opcode == Opcodes.FDIV || opcode == Opcodes.DDIV) {
 
-        // Check if the denominator (second top of stack) is zero
-        if (denominator == SignValue.ZERO) {
-          return true; // Division by zero detected
-        }
+      // Check divisor value on stack
+      if (pFrame.getStack(pFrame.getStackSize() - 2) == SignValue.ZERO) {
+        return true;
       }
     }
-    return false; // No division by zero detected
+    return false;
   }
 
 
-  private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IDIV) {
-      int stackSize = frame.getStackSize();
-      if (stackSize > 0) { // Ensure there are operands on the stack
-        SignValue divisor = frame.getStack(stackSize - 1);
-
-        // Check if the divisor is potentially zero, zero minus, or zero plus
-        return divisor == SignValue.ZERO ||
-                divisor == SignValue.ZERO_MINUS ||
-                divisor == SignValue.ZERO_PLUS;
+  private boolean isMaybeDivByZero(
+          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    int opcode = pInstruction.getOpcode();
+    if (opcode >= Opcodes.IADD && opcode <= Opcodes.DADD) {
+      // Check if any operand might be zero
+      int numOperands = Type.getArgumentTypes(pFrame.toString()).length;
+      for (int i = 0; i < numOperands; i++) {
+        if (pFrame.getStack(pFrame.getStackSize() - numOperands + i) == SignValue.ZERO) {
+          return true;
+        }
       }
     }
     return false;
@@ -167,16 +165,18 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
 
-  private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IALOAD) {
-      int stackSize = frame.getStackSize();
-      if (stackSize > 0) { // Ensure there are operands on the stack
-        SignValue indexValue = frame.getStack(stackSize - 1);
 
-        // Check if the index value is negative, zero minus, or plus minus
-        return indexValue == SignValue.MINUS ||
-                indexValue == SignValue.ZERO_MINUS ||
-                indexValue == SignValue.PLUS_MINUS;
+  private boolean isNegativeArrayIndex(
+          final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    int opcode = pInstruction.getOpcode();
+    if (opcode == Opcodes.IALOAD || opcode == Opcodes.LALOAD ||
+            opcode == Opcodes.FALOAD || opcode == Opcodes.DALOAD ||
+            opcode == Opcodes.AALOAD || opcode == Opcodes.BALOAD ||
+            opcode == Opcodes.CALOAD || opcode == Opcodes.SALOAD) {
+
+      // Check array index
+      if (pFrame.getStack(pFrame.getStackSize() - 1) == SignValue.MINUS) {
+        return true;
       }
     }
     return false;
@@ -187,7 +187,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     if (instruction.getOpcode() == IALOAD) {
       int stackSize = frame.getStackSize();
       if (stackSize > 0) { // Ensure there are operands on the stack
-        SignValue indexValue = frame.getStack(stackSize - 1);
+        SignValue indexValue = frame.getStack(stackSize - 2);
 
         // Check if the index value is potentially negative, zero minus, plus minus, or top
         return indexValue == SignValue.MINUS ||
