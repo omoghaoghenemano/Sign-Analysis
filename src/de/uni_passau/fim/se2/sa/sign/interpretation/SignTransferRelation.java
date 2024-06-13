@@ -399,7 +399,7 @@ public class SignTransferRelation implements TransferRelation {
 
         if(pLHS == SignValue.UNINITIALIZED_VALUE) {// Handle PLUS cases
           if(pRHS == SignValue.ZERO){
-            return  SignValue.ZERO;
+            return  SignValue.BOTTOM;
           }
         }
 
