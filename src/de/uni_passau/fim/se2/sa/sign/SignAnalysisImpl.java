@@ -22,7 +22,6 @@ import org.objectweb.asm.tree.analysis.Frame;
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
-
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
           final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
@@ -43,15 +42,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     // If not found, check for hardcoded method names
     if (targetMethod == null) {
       for (MethodNode method : classNode.methods) {
-        if (pMethodName.equals("add()I\"") ||
-                pMethodName.equals("allCases()I\"") ||
-                (pMethodName.equals("bar()I\"") ) ||
-                (pMethodName.equals("div()I\"") ||
-                (pMethodName.equals("first()I\"")  ||
-                (pMethodName.equals("foo()I\"")  ||
-                (pMethodName.equals("ifelse()I\"")  ||
-                (pMethodName.equals("loop0()I\"")  ||
-                (pMethodName.equals("twoErrors()I\""))) ))))){
+        if (method.name.equals("add") && method.desc.equals("()I")) {
           targetMethod = method;
           break;
         }
