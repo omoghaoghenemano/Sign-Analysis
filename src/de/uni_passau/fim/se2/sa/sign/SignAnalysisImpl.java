@@ -2,7 +2,6 @@ package de.uni_passau.fim.se2.sa.sign;
 
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
-import de.uni_passau.fim.se2.sa.examples.PublicFunctional;
 import de.uni_passau.fim.se2.sa.sign.interpretation.SignInterpreter;
 import de.uni_passau.fim.se2.sa.sign.interpretation.SignValue;
 import java.io.IOException;
@@ -19,10 +18,7 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
 
-public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
-
-
-
+public class SignAnalysisImpl implements SignAnalysis, Opcodes {
 
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
@@ -33,52 +29,11 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
     MethodNode targetMethod = null;
     for (MethodNode method : classNode.methods) {
-      if (method.name.equals("add") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-
-      if (method.name.equals("allCases") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("bar") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("div") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("first") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-
-      if (method.name.equals("foo") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("ifelse") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("loop0") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("twoErrors") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-
       if (method.name.equals(pMethodName)) {
         targetMethod = method;
         break;
       }
-
     }
-
 
     if (targetMethod == null) {
       throw new IllegalArgumentException("Method not found: " + pMethodName);
@@ -94,16 +49,11 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
       Frame<SignValue> frame = frames[i];
       if (frame != null) {
         pairs.add(new Pair<>(instruction, frame));
-
       }
     }
 
-   
-
     return extractAnalysisResults(pairs);
   }
-
-
 
   private SortedSetMultimap<Integer, AnalysisResult> extractAnalysisResults(
           final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
@@ -133,94 +83,40 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     return result;
   }
 
-  /**
-   * Checks if the instruction causes a division by zero.
-   *
-   * @param instruction The instruction node.
-   * @param frame       The frame containing sign values.
-   * @return True if the instruction causes division by zero, false otherwise.
-   */
-  private boolean isDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == Opcodes.IDIV ||
-            instruction.getOpcode() == Opcodes.LDIV ||
-            instruction.getOpcode() == Opcodes.FDIV ||
-            instruction.getOpcode() == Opcodes.DDIV) {
-      SignValue divisor = frame.getStack(frame.getStackSize() - 1);
-      return SignValue.isZero(divisor);
+  private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    if (pInstruction.getOpcode() == IDIV) {
+      SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
+      return divisor == SignValue.ZERO;
     }
     return false;
   }
 
-  /**
-   * Checks if the instruction might cause a division by zero.
-   *
-   * @param instruction The instruction node.
-   * @param frame       The frame containing sign values.
-   * @return True if the instruction might cause division by zero, false otherwise.
-   */
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == Opcodes.IDIV ||
-            instruction.getOpcode() == Opcodes.LDIV ||
-            instruction.getOpcode() == Opcodes.FDIV ||
-            instruction.getOpcode() == Opcodes.DDIV) {
-      if (frame.getStackSize() > 0) {
-        SignValue divisor = frame.getStack(frame.getStackSize() - 1);
-        return SignValue.isMaybeZero(divisor);
-      }
-    }
-    return false;
+    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
+            frame.getStackSize() > 0 &&
+            (frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_PLUS);
   }
 
-  /**
-   * Checks if the instruction causes a negative array index.
-   *
-   * @param instruction The instruction node.
-   * @param frame       The frame containing sign values.
-   * @return True if the instruction causes negative array index, false otherwise.
-   */
   private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == Opcodes.IALOAD ||
-            instruction.getOpcode() == Opcodes.LALOAD ||
-            instruction.getOpcode() == Opcodes.FALOAD ||
-            instruction.getOpcode() == Opcodes.DALOAD ||
-            instruction.getOpcode() == Opcodes.BALOAD ||
-            instruction.getOpcode() == Opcodes.CALOAD ||
-            instruction.getOpcode() == Opcodes.SALOAD) {
-      if (frame.getStackSize() > 0) {
-        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
-        return SignValue.isNegative(indexValue);
-      }
-    }
-    return false;
+    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
+            frame.getStackSize() > 0 &&
+            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS);
   }
 
-  /**
-   * Checks if the instruction might cause a negative array index.
-   *
-   * @param instruction The instruction node.
-   * @param frame       The frame containing sign values.
-   * @return True if the instruction might cause negative array index, false otherwise.
-   */
   private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == Opcodes.IALOAD ||
-            instruction.getOpcode() == Opcodes.LALOAD ||
-            instruction.getOpcode() == Opcodes.FALOAD ||
-            instruction.getOpcode() == Opcodes.DALOAD ||
-            instruction.getOpcode() == Opcodes.BALOAD ||
-            instruction.getOpcode() == Opcodes.CALOAD ||
-            instruction.getOpcode() == Opcodes.SALOAD) {
-      if (frame.getStackSize() > 0) {
-        SignValue indexValue = frame.getStack(frame.getStackSize() - 1);
-        return SignValue.isMaybeNegative(indexValue);
-      }
-    }
-    return false;
+    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
+            frame.getStackSize() > 0 &&
+            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS ||
+                    frame.getStack(frame.getStackSize() - 1) == SignValue.TOP);
   }
-
-
 
   public record Pair<K, V>(K key, V value) {
-
     @Override
     public String toString() {
       return "Pair{key=" + key + ", value=" + value + '}';
