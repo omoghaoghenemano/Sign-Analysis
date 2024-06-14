@@ -136,6 +136,9 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     }
     return false;
   }
+  private boolean add(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    return instruction.getOpcode() == Opcodes.IADD;
+  }
 
   public record Pair<K, V>(K key, V value) {
     @Override
