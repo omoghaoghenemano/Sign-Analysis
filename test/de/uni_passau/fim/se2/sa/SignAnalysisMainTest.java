@@ -30,7 +30,8 @@ public class SignAnalysisMainTest {
         // Given
 
         signAnalysisMain.setClassName("de.uni_passau.fim.se2.sa.sign.SignAnalysisImpl");
-        signAnalysisMain.setMethodName("analyse");
+        signAnalysisMain.setMethodName("isNegativeArrayIndex");
+        
 
         // When
         Callable<Integer> callable = signAnalysisMain;
@@ -41,5 +42,6 @@ public class SignAnalysisMainTest {
         String output = outputStream.toString();
         assertTrue(output.contains("No warnings or errors found")); // Assuming no results expected in this basic test
     }
+
 
  }
