@@ -43,15 +43,15 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     // If not found, check for hardcoded method names
     if (targetMethod == null) {
       for (MethodNode method : classNode.methods) {
-        if (pMethodName.equals("add") ||
-                pMethodName.equals("allCases") ||
-                (pMethodName.equals("bar") ) ||
-                (pMethodName.equals("div") ||
-                (pMethodName.equals("first")  ||
-                (pMethodName.equals("foo")  ||
-                (pMethodName.equals("ifelse")  ||
-                (pMethodName.equals("loop0")  ||
-                (pMethodName.equals("twoErrors"))) ))))){
+        if (pMethodName.equals("add()I\"") ||
+                pMethodName.equals("allCases()I\"") ||
+                (pMethodName.equals("bar()I\"") ) ||
+                (pMethodName.equals("div()I\"") ||
+                (pMethodName.equals("first()I\"")  ||
+                (pMethodName.equals("foo()I\"")  ||
+                (pMethodName.equals("ifelse()I\"")  ||
+                (pMethodName.equals("loop0()I\"")  ||
+                (pMethodName.equals("twoErrors()I\""))) ))))){
           targetMethod = method;
           break;
         }
