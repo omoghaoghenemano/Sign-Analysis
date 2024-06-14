@@ -487,7 +487,7 @@ public class SignInterpreter extends Interpreter<SignValue> implements Opcodes {
 
 
       default:
-        throw new UnsupportedOperationException("Unsupported operation: " );
+        return SignValue.TOP;
 
     }
   }
