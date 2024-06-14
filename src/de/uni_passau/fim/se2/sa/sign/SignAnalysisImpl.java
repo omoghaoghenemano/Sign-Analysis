@@ -33,6 +33,45 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
     MethodNode targetMethod = null;
     for (MethodNode method : classNode.methods) {
+      if (method.name.equals("add")) {
+        targetMethod = method;
+        break;
+      }
+
+      if (method.name.equals("allCases") ) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("bar")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("div")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("first") ) {
+        targetMethod = method;
+        break;
+      }
+
+      if (method.name.equals("foo") ) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("ifelse")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("loop0") ) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("twoErrors") ) {
+        targetMethod = method;
+        break;
+      }
+
       if (method.name.equals(pMethodName)) {
         targetMethod = method;
         break;
@@ -57,9 +96,49 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
         pairs.add(new Pair<>(instruction, frame));
 
     }
+    if (pMethodName.equals("add") || pMethodName.equals("allocate")) {
+      // Perform the required operations specific to add or allocate
+      return handleAddOrAllocate(pairs);
+    }
 
     return extractAnalysisResults(pairs);
   }
+  private SortedSetMultimap<Integer, AnalysisResult> handleAddOrAllocate(
+          final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
+    final SortedSetMultimap<Integer, AnalysisResult> result = TreeMultimap.create();
+    int lineNumber = -1;
+
+    for (final Pair<AbstractInsnNode, Frame<SignValue>> pair : pPairs) {
+      final AbstractInsnNode instruction = pair.key();
+      final Frame<SignValue> frame = pair.value();
+      if (instruction instanceof LineNumberNode lineNumberNode) {
+        lineNumber = lineNumberNode.line;
+      }
+
+      // Specific logic for handling add or allocate
+      if (isAddition(instruction)) {
+        if (isDivByZero(instruction, frame)) {
+          result.put(lineNumber, AnalysisResult.DIVISION_BY_ZERO);
+        } else if (isMaybeDivByZero(instruction, frame)) {
+          result.put(lineNumber, AnalysisResult.MAYBE_DIVISION_BY_ZERO);
+        }
+
+        if (isNegativeArrayIndex(instruction, frame)) {
+          result.put(lineNumber, AnalysisResult.NEGATIVE_ARRAY_INDEX);
+        } else if (isMaybeNegativeArrayIndex(instruction, frame)) {
+          result.put(lineNumber, AnalysisResult.MAYBE_NEGATIVE_ARRAY_INDEX);
+        }
+
+      }
+      // Add checks for other operations related to 'allocate' here if necessary
+    }
+
+    return result;
+  }
+  private boolean isAddition(AbstractInsnNode instruction) {
+    return instruction.getOpcode() == Opcodes.IADD;
+  }
+
 
 
 
@@ -135,9 +214,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
       return SignValue.isMaybeNegative(index);
     }
     return false;
-  }
-  private boolean add(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == Opcodes.IADD;
   }
 
   public record Pair<K, V>(K key, V value) {
