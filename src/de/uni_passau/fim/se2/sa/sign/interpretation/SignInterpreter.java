@@ -104,33 +104,391 @@ public class SignInterpreter extends Interpreter<SignValue> implements Opcodes {
 
   /** {@inheritDoc} */
   @Override
-  public SignValue binaryOperation(final AbstractInsnNode pInstruction, final SignValue pValue1, final SignValue pValue2) {
+  public SignValue binaryOperation(final AbstractInsnNode pInstruction, final SignValue pLHS, final SignValue pRHS) {
     switch (pInstruction.getOpcode()) {
       case IADD:
-        // Handle addition operation
-        if (pValue1 == SignValue.ZERO) {
-          return pValue2;
-        } else if (pValue2 == SignValue.ZERO) {
-          return pValue1;
-        } else if (pValue1 == SignValue.PLUS && pValue2 == SignValue.PLUS) {
-          return SignValue.PLUS;
-        } else if (pValue1 == SignValue.MINUS && pValue2 == SignValue.MINUS) {
-          return SignValue.MINUS;
-        } else {
-          return SignValue.TOP; // Handle other cases gracefully
-        }
-      case ISUB:
+        if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
+          return  SignValue.BOTTOM;
+        if(pLHS == SignValue.UNINITIALIZED_VALUE && pRHS == SignValue.ZERO) return  SignValue.TOP;
+        if(pLHS.equals(SignValue.ZERO_PLUS) && pRHS.equals(SignValue.ZERO_PLUS))
+          return  SignValue.ZERO_PLUS;
+        if (pLHS == SignValue.ZERO && pRHS == SignValue.UNINITIALIZED_VALUE) return  SignValue.TOP;
+        if (pLHS == SignValue.ZERO) return pRHS;
+        if (pRHS == SignValue.ZERO) return pLHS;
+        if (pLHS == SignValue.PLUS && pRHS == SignValue.PLUS || pLHS == SignValue.PLUS && pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.PLUS && pLHS == SignValue.ZERO_PLUS)return SignValue.PLUS;
+        if (pLHS == SignValue.MINUS && pRHS == SignValue.MINUS) return SignValue.MINUS;
+        if ((pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) || (pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.MINUS)) return SignValue.TOP;
+        if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.MINUS;
+        if (pRHS == SignValue.MINUS && pLHS == SignValue.ZERO_MINUS) return SignValue.MINUS;
+        if(pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.ZERO_MINUS;
+        if(pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.PLUS_MINUS) return SignValue.TOP;
+        if (pLHS ==  SignValue.MINUS && pRHS == SignValue.PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.ZERO_PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.TOP
+                || pLHS ==  SignValue.MINUS && pRHS == SignValue.UNINITIALIZED_VALUE || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.PLUS || pLHS == SignValue.ZERO_PLUS && pRHS == SignValue.PLUS_MINUS || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.PLUS_MINUS  || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.ZERO_PLUS || pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.PLUS  ) return SignValue.TOP;
+
+        return  SignValue.TOP;
+
+        case ISUB:
         // Handle subtraction operation
-        if (pValue1 == pValue2) {
-          return SignValue.ZERO;
-        } else if (pValue2 == SignValue.ZERO) {
-          return pValue1;
-        } else {
-          return SignValue.TOP; // Handle other cases gracefully
+        if (pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM)) {
+          return SignValue.BOTTOM;
         }
+        if(pLHS == SignValue.UNINITIALIZED_VALUE && pRHS == SignValue.ZERO) return  SignValue.TOP;
+
+        if(pLHS == SignValue.PLUS_MINUS){
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.PLUS_MINUS;
+          }
+
+        }
+        if (pLHS == SignValue.ZERO) {
+          if (pRHS == SignValue.ZERO_PLUS) {
+            return SignValue.ZERO_MINUS;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
+            return  SignValue.PLUS_MINUS;
+          }
+
+
+          if(pRHS == SignValue.UNINITIALIZED_VALUE){
+            return SignValue.TOP;
+          }
+          if (pRHS == SignValue.TOP) {
+            return SignValue.TOP;
+          }
+          if (pRHS == SignValue.ZERO) {
+            return SignValue.ZERO;
+          }
+
+
+          return pRHS == SignValue.PLUS ? SignValue.MINUS : SignValue.PLUS;
+        }
+
+
+        if (pLHS == SignValue.MINUS) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS) {
+            return SignValue.MINUS;
+          }
+          if (pRHS == SignValue.MINUS) {
+            return SignValue.TOP;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.MINUS;
+          }
+        }
+
+        if(pLHS == SignValue.ZERO_PLUS){
+          if(pRHS == SignValue.MINUS){
+            return SignValue.PLUS;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO_PLUS;
+          }
+
+        }
+
+        if(pLHS == SignValue.ZERO_MINUS){
+          if(pRHS == SignValue.PLUS){
+            return SignValue.MINUS;
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return  SignValue.ZERO_MINUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO_MINUS;
+          }
+        }
+        if (pLHS == SignValue.PLUS) {
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.PLUS;
+          }
+          if(pRHS == SignValue.MINUS || pRHS == SignValue.ZERO){
+            return  SignValue.PLUS;
+          }
+
+
+        }
+        if (pLHS == SignValue.PLUS && pRHS == SignValue.PLUS) {
+          return SignValue.TOP;
+        }
+
+        return SignValue.TOP;
+      case IMUL:
+        if (pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM)) {
+          return SignValue.BOTTOM;
+        }
+
+        // Handle uninitialized and zero cases
+
+
+        // Handle PLUS_MINUS cases
+        if (pLHS == SignValue.PLUS_MINUS) {
+          if (pRHS == SignValue.ZERO) {
+            return SignValue.ZERO;
+          }
+          if(pRHS == SignValue.PLUS_MINUS || pRHS == SignValue.MINUS || pRHS == SignValue.PLUS){
+            return  SignValue.PLUS_MINUS;
+          }
+
+
+
+          // Additional cases can be added here if needed
+        }
+
+        // Handle ZERO cases
+        if (pLHS == SignValue.ZERO) {
+          return  pLHS;
+          // Additional cases can be added here if needed
+          // Default case
+        }
+
+        // Handle MINUS cases
+        if (pLHS == SignValue.MINUS) {
+          if (pRHS == SignValue.PLUS ) {
+            return SignValue.MINUS; // Assuming MINUS as the priority
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return SignValue.ZERO_MINUS;
+          }
+          if(pRHS == SignValue.MINUS){
+            return  SignValue.PLUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
+            return  SignValue.PLUS_MINUS;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        // Handle ZERO_PLUS cases
+        if (pLHS == SignValue.ZERO_PLUS) {
+          if (pRHS == SignValue.MINUS ) {
+            return SignValue.ZERO_MINUS;
+          }
+          if( pRHS == SignValue.ZERO_MINUS ){
+            return SignValue.ZERO_MINUS;
+          }
+          if( pRHS == SignValue.ZERO){
+            return SignValue.ZERO;
+          }
+          if(pRHS == SignValue.PLUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        // Handle ZERO_MINUS cases
+        if (pLHS == SignValue.ZERO_MINUS) {
+          if (pRHS == SignValue.PLUS || pRHS == SignValue.ZERO_PLUS ) {
+            return SignValue.ZERO_MINUS; // Assuming ZERO_MINUS as the priority
+          }
+          if(pRHS == SignValue.MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
+
+          if( pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        if(pLHS == SignValue.TOP) {// Handle PLUS cases
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+        }
+
+        if(pLHS == SignValue.UNINITIALIZED_VALUE) {// Handle PLUS cases
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+        }
+
+        if (pLHS == SignValue.PLUS) {
+          if (pRHS == SignValue.ZERO_MINUS ) {
+            return SignValue.ZERO_MINUS; // Assuming PLUS as the priority
+          }
+          if( pRHS == SignValue.MINUS){
+            return SignValue.MINUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.ZERO;
+          }
+          if(pRHS == SignValue.PLUS_MINUS){
+            return  SignValue.PLUS_MINUS;
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.PLUS){
+            return SignValue.PLUS;
+          }
+
+          // Additional cases can be added here if needed
+        }
+
+        // Default case
+        return SignValue.TOP;
+
+
+      case IDIV:
+        // Handle bottom cases
+        if (pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM)) {
+          return SignValue.BOTTOM;
+        }
+
+        // Handle uninitialized and zero cases
+
+
+        // Handle PLUS_MINUS cases
+        if (pLHS == SignValue.PLUS_MINUS) {
+          if (pRHS == SignValue.ZERO) {
+            return SignValue.BOTTOM;
+          }
+
+          return  SignValue.TOP;
+
+
+          // Additional cases can be added here if needed
+        }
+
+        // Handle ZERO cases
+        if (pLHS == SignValue.ZERO) {
+          if(pRHS == SignValue.ZERO ){
+            return SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.TOP || pRHS == SignValue.UNINITIALIZED_VALUE){
+            return SignValue.TOP;
+          }
+          return  pLHS;
+          // Additional cases can be added here if needed
+          // Default case
+        }
+
+        // Handle MINUS cases
+        if (pLHS == SignValue.MINUS) {
+          if (pRHS == SignValue.PLUS ) {
+            return SignValue.ZERO_MINUS; // Assuming MINUS as the priority
+          }
+          if(pRHS == SignValue.ZERO_PLUS){
+            return SignValue.ZERO_MINUS;
+          }
+          if(pRHS == SignValue.MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        // Handle ZERO_PLUS cases
+        if (pLHS == SignValue.ZERO_PLUS) {
+          if (pRHS == SignValue.PLUS ) {
+            return SignValue.ZERO_PLUS; // Assuming ZERO_MINUS as the priority
+          }
+          if( pRHS == SignValue.ZERO_PLUS){
+            return SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.MINUS){
+            return SignValue.ZERO_MINUS;
+          }
+
+          if( pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO_MINUS;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        // Handle ZERO_MINUS cases
+        if (pLHS == SignValue.ZERO_MINUS) {
+          if (pRHS == SignValue.PLUS ) {
+            return SignValue.ZERO_MINUS; // Assuming ZERO_MINUS as the priority
+          }
+          if( pRHS == SignValue.ZERO_PLUS){
+            return SignValue.ZERO_MINUS;
+          }
+          if(pRHS == SignValue.MINUS){
+            return SignValue.ZERO_PLUS;
+          }
+
+          if( pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+          if(pRHS == SignValue.ZERO_MINUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          // Additional cases can be added here if needed
+          return SignValue.TOP; // Default case
+        }
+
+        if(pLHS == SignValue.TOP) {// Handle PLUS cases
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+        }
+
+        if(pLHS == SignValue.UNINITIALIZED_VALUE) {// Handle PLUS cases
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+        }
+
+        if (pLHS == SignValue.PLUS) {
+          if (pRHS == SignValue.ZERO_MINUS ) {
+            return SignValue.ZERO_MINUS; // Assuming PLUS as the priority
+          }
+          if( pRHS == SignValue.MINUS){
+            return SignValue.ZERO_MINUS;
+          }
+          if(pRHS == SignValue.ZERO){
+            return  SignValue.BOTTOM;
+          }
+
+          if(pRHS == SignValue.ZERO_PLUS){
+            return  SignValue.ZERO_PLUS;
+          }
+          if(pRHS == SignValue.PLUS){
+            return SignValue.ZERO_PLUS;
+          }
+          return  SignValue.TOP;
+        }
+
+        // Default case
+        return SignValue.TOP;
+
+
       default:
-        // Handle other unsupported instructions gracefully
-        return SignValue.TOP; // or return pValue1, pValue2, or another appropriate default
+        throw new UnsupportedOperationException("Unsupported operation: " );
+
     }
   }
 
