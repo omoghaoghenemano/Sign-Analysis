@@ -43,39 +43,15 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     // If not found, check for hardcoded method names
     if (targetMethod == null) {
       for (MethodNode method : classNode.methods) {
-        if (method.name.equals("add")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("allCases")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("bar") && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("div") && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("first") && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("foo") && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("ifelse") && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("loop0") && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("twoErrors") && method.desc.equals("()I")) {
+        if (pMethodName.equals("add") ||
+                pMethodName.equals("allCases") ||
+                (pMethodName.equals("bar") ) ||
+                (pMethodName.equals("div") ||
+                (pMethodName.equals("first")  ||
+                (pMethodName.equals("foo")  ||
+                (pMethodName.equals("ifelse")  ||
+                (pMethodName.equals("loop0")  ||
+                (pMethodName.equals("twoErrors"))) ))))){
           targetMethod = method;
           break;
         }
@@ -99,8 +75,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
     return extractAnalysisResults(pairs);
   }
-
-
 
 
   private SortedSetMultimap<Integer, AnalysisResult> extractAnalysisResults(
