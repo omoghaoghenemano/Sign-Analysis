@@ -38,39 +38,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
         break;
       }
 
-      if (method.name.equals("allCases") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("bar") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("div") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("first") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-
-      if (method.name.equals("foo") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("ifelse") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("loop0") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("twoErrors") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
 
       if (method.name.equals(pMethodName)) {
         targetMethod = method;
