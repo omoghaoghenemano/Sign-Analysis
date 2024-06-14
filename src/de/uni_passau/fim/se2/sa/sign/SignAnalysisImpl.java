@@ -131,7 +131,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
   }
   private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
     // Check if the instruction is a division operation (IDIV)
-    if (pInstruction.getOpcode() == IDIV) {
+    if (pInstruction.getOpcode() == IDIV || pInstruction.getOpcode() == IADD || pInstruction.getOpcode() == IMUL || pInstruction.getOpcode() == ISUB) {
       // Get the divisor value from the stack
       SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
 
@@ -144,7 +144,7 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
   }
 
   private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == IDIV && frame.getStackSize() > 0) {
+    if (instruction.getOpcode() == IDIV || instruction.getOpcode() == IADD || instruction.getOpcode() == IMUL || instruction.getOpcode() == ISUB) {
       SignValue divisor = frame.getStack(frame.getStackSize() - 1);
       return SignValue.isMaybeZero(divisor);
     }
