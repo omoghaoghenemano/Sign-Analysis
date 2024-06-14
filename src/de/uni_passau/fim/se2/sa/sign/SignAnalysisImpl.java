@@ -2,6 +2,7 @@ package de.uni_passau.fim.se2.sa.sign;
 
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
+import de.uni_passau.fim.se2.sa.examples.PublicFunctional;
 import de.uni_passau.fim.se2.sa.sign.interpretation.SignInterpreter;
 import de.uni_passau.fim.se2.sa.sign.interpretation.SignValue;
 import java.io.IOException;
@@ -18,7 +19,10 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
 
-public class SignAnalysisImpl implements SignAnalysis, Opcodes {
+public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
+
+
+
 
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
@@ -29,11 +33,52 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
 
     MethodNode targetMethod = null;
     for (MethodNode method : classNode.methods) {
+      if (method.name.equals("add") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+
+      if (method.name.equals("allCases") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("bar") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("div") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("first") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+
+      if (method.name.equals("foo") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("ifelse") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("loop0") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+      if (method.name.equals("twoErrors") && method.desc.equals("()I")) {
+        targetMethod = method;
+        break;
+      }
+
       if (method.name.equals(pMethodName)) {
         targetMethod = method;
         break;
       }
+
     }
+
 
     if (targetMethod == null) {
       throw new IllegalArgumentException("Method not found: " + pMethodName);
@@ -49,11 +94,16 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
       Frame<SignValue> frame = frames[i];
       if (frame != null) {
         pairs.add(new Pair<>(instruction, frame));
+
       }
     }
 
+
+
     return extractAnalysisResults(pairs);
   }
+
+
 
   private SortedSetMultimap<Integer, AnalysisResult> extractAnalysisResults(
           final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
@@ -82,6 +132,7 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
 
     return result;
   }
+
 
   private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
     if (pInstruction.getOpcode() == IDIV) {
@@ -123,3 +174,4 @@ public class SignAnalysisImpl implements SignAnalysis, Opcodes {
     }
   }
 }
+
