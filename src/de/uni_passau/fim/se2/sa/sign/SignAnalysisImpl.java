@@ -150,18 +150,26 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     }
     return false;
   }
-
   private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if ((instruction.getOpcode() == IALOAD || instruction.getOpcode() == BALOAD ||
+            instruction.getOpcode() == SALOAD || instruction.getOpcode() == CALOAD ||
+            instruction.getOpcode() == AALOAD || instruction.getOpcode() == LALOAD ||
+            instruction.getOpcode() == DALOAD || instruction.getOpcode() == FALOAD) &&
+            frame.getStackSize() > 0) {
 
-    if (instruction.getOpcode() == INEG && frame.getStackSize() > 0) {
       SignValue index = frame.getStack(frame.getStackSize() - 1);
       return SignValue.isNegative(index);
     }
     return false;
   }
 
+
   private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    if (instruction.getOpcode() == INEG && frame.getStackSize() > 0) {
+    if ((instruction.getOpcode() == IALOAD || instruction.getOpcode() == BALOAD ||
+            instruction.getOpcode() == SALOAD || instruction.getOpcode() == CALOAD ||
+            instruction.getOpcode() == AALOAD || instruction.getOpcode() == LALOAD ||
+            instruction.getOpcode() == DALOAD || instruction.getOpcode() == FALOAD) &&
+            frame.getStackSize() > 0) {
       SignValue index = frame.getStack(frame.getStackSize() - 1);
       return SignValue.isMaybeNegative(index);
     }
