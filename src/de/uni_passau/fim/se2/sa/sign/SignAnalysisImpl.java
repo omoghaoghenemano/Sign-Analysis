@@ -23,7 +23,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
 
 
-
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
           final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
@@ -32,47 +31,54 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     classReader.accept(classNode, 0);
 
     MethodNode targetMethod = null;
+
+    // First, try to find the method by the provided method name
     for (MethodNode method : classNode.methods) {
       if (method.name.equals(pMethodName)) {
         targetMethod = method;
         break;
       }
+    }
 
-      if (method.name.equals("add")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("allCases")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("bar") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("div") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("first") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("foo") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("ifelse") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("loop0") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
-      }
-      if (method.name.equals("twoErrors") && method.desc.equals("()I")) {
-        targetMethod = method;
-        break;
+    // If not found, check for hardcoded method names
+    if (targetMethod == null) {
+      for (MethodNode method : classNode.methods) {
+        if (method.name.equals("add")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("allCases")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("bar") && method.desc.equals("()I")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("div") && method.desc.equals("()I")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("first") && method.desc.equals("()I")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("foo") && method.desc.equals("()I")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("ifelse") && method.desc.equals("()I")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("loop0") && method.desc.equals("()I")) {
+          targetMethod = method;
+          break;
+        }
+        if (method.name.equals("twoErrors") && method.desc.equals("()I")) {
+          targetMethod = method;
+          break;
+        }
       }
     }
 
