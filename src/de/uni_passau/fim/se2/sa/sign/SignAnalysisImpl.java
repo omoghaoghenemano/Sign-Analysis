@@ -92,12 +92,9 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
     for (int i = 0; i < targetMethod.instructions.size(); i++) {
       AbstractInsnNode instruction = targetMethod.instructions.get(i);
       Frame<SignValue> frame = frames[i];
-      if(targetMethod.name.equals("first") && targetMethod.desc.equals("()I")){
+
         pairs.add(new Pair<>(instruction, frame));
-      }
-      if (frame != null && !targetMethod.name.equals("first") && targetMethod.desc.equals("()I")) {
-        pairs.add(new Pair<>(instruction, frame));
-      }
+
     }
 
     return extractAnalysisResults(pairs);
@@ -132,39 +129,42 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
     return result;
   }
-
-
   private boolean isDivByZero(final AbstractInsnNode pInstruction, final Frame<SignValue> pFrame) {
+    // Check if the instruction is a division operation (IDIV)
     if (pInstruction.getOpcode() == IDIV) {
+      // Get the divisor value from the stack
       SignValue divisor = pFrame.getStack(pFrame.getStackSize() - 1);
-      return divisor == SignValue.ZERO;
+
+      // Check if the divisor is zero
+      if (SignValue.isZero(divisor)) {
+        return true; // Division by zero detected
+      }
+    }
+    return false; // No division by zero detected
+  }
+
+  private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
+    if (instruction.getOpcode() == IDIV && frame.getStackSize() > 0) {
+      SignValue divisor = frame.getStack(frame.getStackSize() - 1);
+      return SignValue.isMaybeZero(divisor);
     }
     return false;
   }
 
-  private boolean isMaybeDivByZero(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IDIV &&
-            frame.getStackSize() > 0 &&
-            (frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_PLUS);
-  }
-
   private boolean isNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
-            frame.getStackSize() > 0 &&
-            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS);
+    if (instruction.getOpcode() == IALOAD && frame.getStackSize() > 0) {
+      SignValue index = frame.getStack(frame.getStackSize() - 1);
+      return SignValue.isNegative(index);
+    }
+    return false;
   }
 
   private boolean isMaybeNegativeArrayIndex(AbstractInsnNode instruction, Frame<SignValue> frame) {
-    return instruction.getOpcode() == org.objectweb.asm.Opcodes.IALOAD &&
-            frame.getStackSize() > 0 &&
-            (frame.getStack(frame.getStackSize() - 1) == SignValue.MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.ZERO_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.PLUS_MINUS ||
-                    frame.getStack(frame.getStackSize() - 1) == SignValue.TOP);
+    if (instruction.getOpcode() == IALOAD && frame.getStackSize() > 0) {
+      SignValue index = frame.getStack(frame.getStackSize() - 1);
+      return SignValue.isMaybeNegative(index);
+    }
+    return false;
   }
 
   public record Pair<K, V>(K key, V value) {

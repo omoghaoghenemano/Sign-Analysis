@@ -90,6 +90,16 @@ public class SignInterpreter extends Interpreter<SignValue> implements Opcodes {
           return SignValue.MINUS;
         } else if (pValue == SignValue.MINUS) {
           return SignValue.PLUS;
+        } else if (pValue == SignValue.ZERO_PLUS) {
+          return SignValue.ZERO_MINUS;
+        } else if (pValue == SignValue.ZERO_MINUS) {
+          return SignValue.ZERO_PLUS;
+        } else if (pValue == SignValue.PLUS_MINUS) {
+          return SignValue.PLUS_MINUS;
+        } else if (pValue == SignValue.ZERO) {
+          return SignValue.ZERO;
+        } else if (pValue == SignValue.TOP) {
+          return SignValue.TOP;
         } else {
           return pValue; // Handle other cases gracefully
         }
