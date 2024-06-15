@@ -16,15 +16,9 @@ public class SignTransferRelation implements TransferRelation {
   }
 
 
-
   @Override
   public SignValue evaluate(final Operation pOperation, final SignValue pValue) {
-    Preconditions.checkState(
-            pOperation == Operation.ADD
-                    || pOperation == Operation.SUB
-                    || pOperation == Operation.MUL
-                    || pOperation == Operation.DIV);
-
+    Preconditions.checkState(pOperation == Operation.NEG);
     Preconditions.checkNotNull(pValue);
 
       return switch (pValue) {

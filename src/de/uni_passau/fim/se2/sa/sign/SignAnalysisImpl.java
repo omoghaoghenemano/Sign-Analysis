@@ -21,7 +21,6 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
-
   @Override
   public SortedSetMultimap<Integer, AnalysisResult> analyse(
           final String pClassName, final String pMethodName) throws AnalyzerException, IOException {
@@ -31,55 +30,16 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
     MethodNode targetMethod = null;
 
-    // First, try to find the method by the provided method name
+    // Split the provided method name to get the name and descriptor
+    String[] parts = pMethodName.split(":");
+    String methodName = parts[0];
+    String methodDesc = parts.length > 1 ? parts[1] : "";
+
+    // Find the target method based on name and descriptor
     for (MethodNode method : classNode.methods) {
-      if (method.name.equals(pMethodName)) {
+      if (method.name.equals(methodName) && ( method.desc.equals(methodDesc))) {
         targetMethod = method;
         break;
-      }
-    }
-
-    // If not found, check for hardcoded method names
-    if (targetMethod == null) {
-      for (MethodNode method : classNode.methods) {
-        if (method.name.equals("add") && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("allCases")  && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("bar")  && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("div")  && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("first")  && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("foo")  && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("ifelse")  && method.desc.equals("()I")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("loop0")  && method.desc.equals("()V")) {
-          targetMethod = method;
-          break;
-        }
-        if (method.name.equals("twoErrors")  && method.desc.equals("()V")) {
-          targetMethod = method;
-          break;
-        }
-
-
       }
     }
 
@@ -100,8 +60,6 @@ public class SignAnalysisImpl  implements SignAnalysis, Opcodes {
 
     return extractAnalysisResults(pairs);
   }
-
-
   private SortedSetMultimap<Integer, AnalysisResult> extractAnalysisResults(
           final List<Pair<AbstractInsnNode, Frame<SignValue>>> pPairs) {
     final SortedSetMultimap<Integer, AnalysisResult> result = TreeMultimap.create();
