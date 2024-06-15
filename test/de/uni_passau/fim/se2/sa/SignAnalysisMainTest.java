@@ -31,7 +31,7 @@ public class SignAnalysisMainTest {
 
         signAnalysisMain.setClassName("de.uni_passau.fim.se2.sa.sign.SignAnalysisImpl");
         signAnalysisMain.setMethodName("isNegativeArrayIndex");
-        
+
 
         // When
         Callable<Integer> callable = signAnalysisMain;

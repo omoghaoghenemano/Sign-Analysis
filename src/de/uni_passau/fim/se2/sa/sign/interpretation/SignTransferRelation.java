@@ -16,36 +16,15 @@ public class SignTransferRelation implements TransferRelation {
   }
 
 
-  public SignValue add(   final SignValue pLHS, final SignValue pRHS) {
-
-
-    if(pLHS.equals(SignValue.BOTTOM) || pRHS.equals(SignValue.BOTTOM))
-      return  SignValue.BOTTOM;
-    if(pLHS == SignValue.UNINITIALIZED_VALUE && pRHS == SignValue.ZERO) return  SignValue.TOP;
-    if(pLHS.equals(SignValue.ZERO_PLUS) && pRHS.equals(SignValue.ZERO_PLUS))
-      return  SignValue.ZERO_PLUS;
-    if (pLHS == SignValue.ZERO && pRHS == SignValue.UNINITIALIZED_VALUE) return  SignValue.TOP;
-    if (pLHS == SignValue.ZERO) return pRHS;
-    if (pRHS == SignValue.ZERO) return pLHS;
-    if (pLHS == SignValue.PLUS && pRHS == SignValue.PLUS || pLHS == SignValue.PLUS && pRHS == SignValue.ZERO_PLUS || pRHS == SignValue.PLUS && pLHS == SignValue.ZERO_PLUS)return SignValue.PLUS;
-    if (pLHS == SignValue.MINUS && pRHS == SignValue.MINUS) return SignValue.MINUS;
-    if ((pLHS == SignValue.MINUS && pRHS == SignValue.PLUS_MINUS) || (pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.MINUS)) return SignValue.TOP;
-    if (pLHS == SignValue.MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.MINUS;
-    if (pRHS == SignValue.MINUS && pLHS == SignValue.ZERO_MINUS) return SignValue.MINUS;
-    if(pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.ZERO_MINUS) return SignValue.ZERO_MINUS;
-    if(pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.PLUS_MINUS) return SignValue.TOP;
-    if (pLHS ==  SignValue.MINUS && pRHS == SignValue.PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.ZERO_PLUS || pLHS ==  SignValue.MINUS && pRHS == SignValue.TOP
-            || pLHS ==  SignValue.MINUS && pRHS == SignValue.UNINITIALIZED_VALUE || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.PLUS || pLHS == SignValue.ZERO_PLUS && pRHS == SignValue.PLUS_MINUS || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.PLUS_MINUS  || pLHS == SignValue.ZERO_MINUS && pRHS == SignValue.ZERO_PLUS || pLHS == SignValue.PLUS_MINUS && pRHS == SignValue.PLUS  ) return SignValue.TOP;
-
-    return  SignValue.TOP;
-
-
-  }
-
 
   @Override
   public SignValue evaluate(final Operation pOperation, final SignValue pValue) {
-    Preconditions.checkState(pOperation == Operation.NEG);
+    Preconditions.checkState(
+            pOperation == Operation.ADD
+                    || pOperation == Operation.SUB
+                    || pOperation == Operation.MUL
+                    || pOperation == Operation.DIV);
+
     Preconditions.checkNotNull(pValue);
 
       return switch (pValue) {
