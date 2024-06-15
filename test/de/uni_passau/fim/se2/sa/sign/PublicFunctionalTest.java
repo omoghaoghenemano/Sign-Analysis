@@ -1,7 +1,9 @@
 package de.uni_passau.fim.se2.sa.sign;
-
 import de.uni_passau.fim.se2.sa.examples.PublicFunctional;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +24,7 @@ public class PublicFunctionalTest {
     @Test
     public void testIfElse() {
         PublicFunctional pf = new PublicFunctional();
-        assertDoesNotThrow( pf::ifelse);
+        assertDoesNotThrow(pf::ifelse);
     }
 
     @Test
@@ -42,6 +44,7 @@ public class PublicFunctionalTest {
         PublicFunctional pf = new PublicFunctional();
         assertThrows(ArithmeticException.class, pf::div);
     }
+
 
     @Test
     public void testFoo() {

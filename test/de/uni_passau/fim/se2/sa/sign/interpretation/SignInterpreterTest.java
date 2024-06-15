@@ -150,10 +150,15 @@ public class SignInterpreterTest {
 
         AbstractInsnNode iadd = new InsnNode(IADD);
         assertEquals(SignValue.PLUS, interpreter.binaryOperation(iadd, SignValue.PLUS, SignValue.PLUS));
+        assertEquals(SignValue.BOTTOM, interpreter.binaryOperation(iadd, SignValue.BOTTOM, SignValue.PLUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(iadd, SignValue.UNINITIALIZED_VALUE, SignValue.ZERO));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(iadd, SignValue.ZERO_PLUS, SignValue.ZERO_PLUS));
 
         AbstractInsnNode isub = new InsnNode(ISUB);
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.ZERO, SignValue.UNINITIALIZED_VALUE));
         assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.PLUS, SignValue.PLUS));
-
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.ZERO_PLUS, SignValue.PLUS));
         AbstractInsnNode imul = new InsnNode(IMUL);
         assertEquals(SignValue.MINUS, interpreter.binaryOperation(imul, SignValue.PLUS, SignValue.MINUS));
 
