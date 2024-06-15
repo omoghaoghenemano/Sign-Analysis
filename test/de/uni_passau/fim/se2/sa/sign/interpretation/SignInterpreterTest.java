@@ -153,18 +153,50 @@ public class SignInterpreterTest {
         assertEquals(SignValue.BOTTOM, interpreter.binaryOperation(iadd, SignValue.BOTTOM, SignValue.PLUS));
         assertEquals(SignValue.TOP, interpreter.binaryOperation(iadd, SignValue.UNINITIALIZED_VALUE, SignValue.ZERO));
         assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(iadd, SignValue.ZERO_PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.MINUS, interpreter.binaryOperation(iadd, SignValue.MINUS, SignValue.MINUS));
+        assertEquals(SignValue.MINUS, interpreter.binaryOperation(iadd, SignValue.MINUS, SignValue.ZERO_MINUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(iadd, SignValue.MINUS, SignValue.PLUS_MINUS));
 
         AbstractInsnNode isub = new InsnNode(ISUB);
         assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.ZERO, SignValue.UNINITIALIZED_VALUE));
         assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.PLUS, SignValue.PLUS));
         assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.PLUS, SignValue.ZERO_PLUS));
         assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.ZERO_PLUS, SignValue.PLUS));
+        assertEquals(SignValue.BOTTOM, interpreter.binaryOperation(isub, SignValue.BOTTOM, SignValue.PLUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.UNINITIALIZED_VALUE, SignValue.ZERO));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.ZERO_PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.MINUS, SignValue.MINUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.MINUS, SignValue.ZERO_MINUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(isub, SignValue.MINUS, SignValue.PLUS_MINUS));
+        assertEquals(SignValue.ZERO_MINUS, interpreter.binaryOperation(isub, SignValue.ZERO_MINUS, SignValue.ZERO_PLUS));
+
         AbstractInsnNode imul = new InsnNode(IMUL);
+        assertEquals(SignValue.ZERO, interpreter.binaryOperation(imul, SignValue.ZERO, SignValue.UNINITIALIZED_VALUE));
+        assertEquals(SignValue.PLUS, interpreter.binaryOperation(imul, SignValue.PLUS, SignValue.PLUS));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(imul, SignValue.PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(imul, SignValue.ZERO_PLUS, SignValue.PLUS));
+        assertEquals(SignValue.BOTTOM, interpreter.binaryOperation(imul, SignValue.BOTTOM, SignValue.PLUS));
+        assertEquals(SignValue.ZERO, interpreter.binaryOperation(imul, SignValue.UNINITIALIZED_VALUE, SignValue.ZERO));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(imul, SignValue.ZERO_PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.PLUS, interpreter.binaryOperation(imul, SignValue.MINUS, SignValue.MINUS));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(imul, SignValue.MINUS, SignValue.ZERO_MINUS));
+        assertEquals(SignValue.PLUS_MINUS, interpreter.binaryOperation(imul, SignValue.MINUS, SignValue.PLUS_MINUS));
         assertEquals(SignValue.MINUS, interpreter.binaryOperation(imul, SignValue.PLUS, SignValue.MINUS));
-
+        assertEquals(SignValue.ZERO_MINUS, interpreter.binaryOperation(imul, SignValue.MINUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.ZERO_MINUS, interpreter.binaryOperation(imul, SignValue.ZERO_PLUS, SignValue.MINUS));
         AbstractInsnNode idiv = new InsnNode(IDIV);
-        assertEquals(SignValue.BOTTOM, interpreter.binaryOperation(idiv, SignValue.ZERO, SignValue.ZERO));
-
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(idiv, SignValue.ZERO, SignValue.UNINITIALIZED_VALUE));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(idiv, SignValue.PLUS, SignValue.PLUS));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(idiv, SignValue.PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(idiv, SignValue.ZERO_PLUS, SignValue.PLUS));
+        assertEquals(SignValue.BOTTOM, interpreter.binaryOperation(idiv, SignValue.BOTTOM, SignValue.PLUS));
+        assertEquals(SignValue.BOTTOM, interpreter.binaryOperation(idiv, SignValue.UNINITIALIZED_VALUE, SignValue.ZERO));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(idiv, SignValue.ZERO_PLUS, SignValue.ZERO_PLUS));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(idiv, SignValue.MINUS, SignValue.MINUS));
+        assertEquals(SignValue.ZERO_PLUS, interpreter.binaryOperation(idiv, SignValue.MINUS, SignValue.ZERO_MINUS));
+        assertEquals(SignValue.TOP, interpreter.binaryOperation(idiv, SignValue.MINUS, SignValue.PLUS_MINUS));
+        assertEquals(SignValue.ZERO_MINUS, interpreter.binaryOperation(idiv, SignValue.MINUS, SignValue.PLUS));
+        assertEquals(SignValue.ZERO_MINUS, interpreter.binaryOperation(idiv, SignValue.PLUS, SignValue.ZERO_MINUS));
         AbstractInsnNode ineg = new InsnNode(INEG);
         assertEquals(SignValue.TOP, interpreter.binaryOperation(ineg, SignValue.ZERO, SignValue.ZERO));
     }
