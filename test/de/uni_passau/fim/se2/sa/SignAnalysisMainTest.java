@@ -29,8 +29,8 @@ public class SignAnalysisMainTest {
     public void testCall_withValidArguments() throws Exception {
         // Given
 
-        signAnalysisMain.setClassName("de.uni_passau.fim.se2.sa.sign.SignAnalysisImpl");
-        signAnalysisMain.setMethodName("isNegativeArrayIndex");
+        signAnalysisMain.setClassName("de.uni_passau.fim.se2.sa.examples.PublicFunctional");
+        signAnalysisMain.setMethodName("loop0:()V");
 
 
         // When
@@ -40,7 +40,7 @@ public class SignAnalysisMainTest {
         // Then
         assertEquals(0, result);
         String output = outputStream.toString();
-        assertTrue(output.contains("No warnings or errors found")); // Assuming no results expected in this basic test
+        assertTrue(output.contains("Line 59: WARNING: Division by Zero detected")); // Assuming no results expected in this basic test
     }
 
 
